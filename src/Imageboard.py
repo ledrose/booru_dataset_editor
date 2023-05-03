@@ -30,7 +30,9 @@ class Imageboard:
             imgList = []
             for img in data:
                 imgList.append(Image(
-                    id=img['id'], 
+                    imageboard=self,
+                    name=img['md5'],
+                    ext=img['file_ext'],
                     imgLink=img['file_url'], 
                     tags=img['tag_string'].split(' '), 
                     previewImagelink=img['preview_file_url'], 
@@ -55,7 +57,7 @@ class Imageboard:
 def main():
     iboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
     images = iboard.requestImageSearch("1girl 1boy")
-    print(images[1].imgLink)
+    images[1].saveImageWithTags('./testFolder')
 
 if __name__ == "__main__":
     main()
