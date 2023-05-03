@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from Image import Image
+from src.Image import Image
 
 #TODO фабрика ииджбордов :Ъ
 def defaultInputTransform(searchInput):
@@ -17,7 +17,8 @@ class Imageboard:
         if (login!=None and apiKey!=None):
             self.user = {'login': login, 'apiKey': apiKey}
         self.inputTransform = inputTransform
-    
+        self.imgList = []
+
     def requestImageSearch(self, searchInput: str):
         searcgInput = self.inputTransform(searchInput)
         postsUrl = self.mainLink+'/posts.json'
@@ -29,18 +30,24 @@ class Imageboard:
             data = response.json()
             imgList = []
             for img in data:
-                imgList.append(Image(
-                    imageboard=self,
-                    name=img['md5'],
-                    ext=img['file_ext'],
-                    imgLink=img['file_url'], 
-                    tags=img['tag_string'].split(' '), 
-                    previewImagelink=img['preview_file_url'], 
-                    fullImageLink=img['file_url']
-                ))
+                try:
+                    imgList.append(Image(
+                        imageboard=self,
+                        name=img['md5'],
+                        ext=img['file_ext'],
+                        imgLink=img['file_url'], 
+                        tags=img['tag_string'].split(' '), 
+                        previewImagelink=img['preview_file_url'],
+                    ))
+                except:
+                    print("Image with id {} can't be parsed".format(str(img['id'])))
+            self.imgList = imgList
             return imgList
         else:
             raise Exception("Search was not succesful")
+
+    def getImageLinks(self):
+        return [x.imgLink for x in self.imgList]
 
     def requestAuth(self):
         if (self.user==None):

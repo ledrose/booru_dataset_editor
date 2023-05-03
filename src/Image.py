@@ -2,14 +2,13 @@ import requests
 import pathlib
 
 class Image:
-    def __init__(self, imageboard, name, ext, imgLink, tags, previewImagelink, fullImageLink):
+    def __init__(self, imageboard, name, ext, imgLink, tags, previewImagelink):
         self.imageboard = imageboard
         self.imgLink = imgLink
         self.name = name
         self.ext = ext
         self.tags = tags
         self.previewImageLink = previewImagelink
-        self.fullImageLink = fullImageLink
 
 
     def saveImageWithTags(self, path):

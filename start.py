@@ -1,22 +1,29 @@
 import gradio as gr
-import time
+from src.Imageboard import Imageboard
 
-def trim_words(words, lens):
-    trimmed_words = []
-    time.sleep(5)
-    for w, l in zip(words, lens):
-        trimmed_words.append(w[:int(l)])        
-    return [trimmed_words]
+iboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
+
+def test(str):
+    iboard.requestImageSearch(str)
+    return iboard.getImageLinks()
 
 with gr.Blocks() as demo:
-    with gr.Row():
-        word = gr.Textbox(label="word")
-        leng = gr.Number(label="leng")
-        output = gr.Textbox(label="Output")
-    with gr.Row():
-        run = gr.Button()
+    with gr.Row(variant="compact"):
+        with gr.Column():
+            request = gr.Textbox(
+                label="Enter your search request",
+                show_label=False,
+                placeholder="Enter your search request",
+                max_lines=1)
+            btn = gr.Button("Request images").style(full_width=False)
+        gallery = gr.Gallery(
+            label="Search results",
+            show_label=False,
+            elem_id='gallery').style(
+                columns=[4], rows=[4], object_fit='contain', height=300
+            )
+    btn.click(test, inputs=[request], outputs=[gallery])
 
-    event = run.click(trim_words, [word, leng], output, batch=True, max_batch_size=16)
 
-demo.queue()
-demo.launch()
+if __name__ == "__main__":
+    demo.launch()
