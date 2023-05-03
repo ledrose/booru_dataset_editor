@@ -1,9 +1,10 @@
 import requests
 from requests.auth import HTTPBasicAuth
 from Image import Image
+
+#TODO фабрика ииджбордов :Ъ
 def defaultInputTransform(searchInput):
     return searchInput.replace(' ', '+')
-
 
 class Imageboard:
     def __init__(self, name, mainLink, inputTransform = defaultInputTransform, login=None, apiKey=None):
