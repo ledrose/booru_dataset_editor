@@ -1,20 +1,27 @@
 import requests
+from requests.auth import HTTPBasicAuth
 from Image import Image
 def defaultInputTransform(searchInput):
     return searchInput.replace(' ', '+')
 
 
 class Imageboard:
-    def __init__(self, name, mainLink, inputTransform = defaultInputTransform, apiKey=None):
+    def __init__(self, name, mainLink, inputTransform = defaultInputTransform, login=None, apiKey=None):
         self.name = name
         self.mainLink = mainLink
-        self.apiKey = apiKey
+        self.authLink= mainLink + '/profile.json'
+        self.postLink= mainLink + '/posts.json'
+        self.isAuthenticated = False
+        self.user = None
+        if (login!=None and apiKey!=None):
+            self.user = {'login': login, 'apiKey': apiKey}
         self.inputTransform = inputTransform
     
     def requestImageSearch(self, searchInput: str):
         searcgInput = self.inputTransform(searchInput)
         postsUrl = self.mainLink+'/posts.json'
-        # TODO authentication
+        if (not self.isAuthenticated and self.user!=None):
+            self.requestAuth()
         payload = {"tags":searchInput}
         response = requests.get(postsUrl, params=payload)
         if (response.status_code==200):
@@ -30,12 +37,22 @@ class Imageboard:
                 ))
             return imgList
         else:
-            return Exception("Request is not succesful")
+            raise Exception("Search was not succesful")
 
+    def requestAuth(self):
+        if (self.user==None):
+            return Exception("User info is missing")
+        basicAuth =  HTTPBasicAuth(self.user['login'], self.user['apiKey'])
+        response = requests.get(self.authLink,auth=basicAuth)
+        if (response.status_code==requests.codes.ok):
+            if (response.json()['name']!=self.user['login']):
+                print("How?")
+        else:
+            raise Exception("Auth is not succesful")
 
 
 def main():
-    iboard = Imageboard("TestBooru", "https://testbooru.donmai.us/")
+    iboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
     images = iboard.requestImageSearch("1girl 1boy")
     print(images[1].imgLink)
 
