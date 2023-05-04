@@ -2,8 +2,8 @@ import requests
 import pathlib
 
 class Image:
-    def __init__(self, imageboard, name, ext, imgLink, tags, previewImagelink):
-        self.imageboard = imageboard
+    def __init__(self, imageboardName: str, name: str, ext: str, imgLink: str, previewImagelink: str, tags: list[str] = []) -> None:
+        self.imageboardName = imageboardName
         self.imgLink = imgLink
         self.name = name
         self.ext = ext
@@ -11,10 +11,10 @@ class Image:
         self.tags = tags
         self.previewImageLink = previewImagelink
 
-    def getImageTuple(self):
+    def getImageTuple(self) -> tuple[str, str]:
         return (self.previewImageLink, self.fullName)
 
-    def saveImageWithTags(self, path):
+    def saveImageWithTags(self, path: str) -> None:
         folder = pathlib.Path(path)
         if (not folder.is_dir()):
             folder.mkdir()

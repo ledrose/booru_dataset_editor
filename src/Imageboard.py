@@ -1,13 +1,14 @@
 import requests
+from collections.abc import Callable
 from requests.auth import HTTPBasicAuth
 from src.Image import Image
 
 #TODO фабрика ииджбордов :Ъ
-def defaultInputTransform(searchInput):
+def defaultInputTransform(searchInput: str) -> str:
     return searchInput.replace(' ', '+')
 
 class Imageboard:
-    def __init__(self, name, mainLink, inputTransform = defaultInputTransform, login=None, apiKey=None):
+    def __init__(self, name: str, mainLink: str, inputTransform: Callable[[str],str] = defaultInputTransform, login: str = None, apiKey: str = None) -> None:
         self.name = name
         self.mainLink = mainLink
         self.authLink= mainLink + '/profile.json'
@@ -19,7 +20,7 @@ class Imageboard:
         self.inputTransform = inputTransform
         self.imgList = []
 
-    def requestImageSearch(self, searchInput: str):
+    def requestImageSearch(self, searchInput: str) -> list[type(Image)]:
         searcgInput = self.inputTransform(searchInput)
         postsUrl = self.mainLink+'/posts.json'
         if (not self.isAuthenticated and self.user!=None):
@@ -32,7 +33,7 @@ class Imageboard:
             for img in data:
                 try:
                     imgList.append(Image(
-                        imageboard=self,
+                        imageboardName=self.name,
                         name=img['md5'],
                         ext=img['file_ext'],
                         imgLink=img['file_url'], 
@@ -46,13 +47,13 @@ class Imageboard:
         else:
             raise Exception("Search was not succesful")
 
-    def getImageLinks(self):
+    def getImageLinks(self) -> list[tuple[str, str]]:
         return [x.getImageTuple() for x in self.imgList]
 
     def getImageWithId(self,id: int) -> type(Image):
         return self.imgList[id]
 
-    def requestAuth(self):
+    def requestAuth(self) -> None:
         if (self.user==None):
             return Exception("User info is missing")
         basicAuth =  HTTPBasicAuth(self.user['login'], self.user['apiKey'])
