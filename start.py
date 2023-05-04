@@ -1,24 +1,36 @@
 import gradio as gr
 from src.Imageboard import Imageboard
+from dataclasses import dataclass
 
+selectedStyle = 'background-color: grey;'
 iboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
 
-def test(str, pageNum, imgCount):
-    iboard.requestImageSearch(str, pageNum, imgCount)
-    return iboard.getImageLinks()
 
-def onSelect(selectedImage, evt: gr.SelectData):
-        return [
-            evt.index,
-            f"You selected {evt.value} at {evt.index} from {evt.target}",
-        ]
+def getPosts(selectedImages: list[int], request: str, pageNum: int, imgCount: int):
+    selectedImages = []
+    iboard.requestImageSearch(request, pageNum, imgCount)
+    return [selectedImages, iboard.getImageLinks()]
 
-def downloadSelected(selectedImage):
+def onSelect(selectedImages: list[int], evt: gr.SelectData):
+    respStr = ""
+    if (selectedImages.count(evt.index)>=1):
+        selectedImages.remove(evt.index)
+        respStr = f"You removed {evt.value} at {evt.index} from {evt.target}"
+    else:
+        selectedImages.append(evt.index)
+        respStr = f"You selected {evt.value} at {evt.index} from {evt.target}"
+    return [
+        selectedImages,
+        respStr,
+    ]
+
+def downloadSelected(selectedImages: list[int]):
     try:
-        iboard.getImageWithId(selectedImage).saveImageWithTags('./test')
-        return [selectedImage,"Ok"]
+        for index in selectedImages:
+            iboard.getImageWithId(index).saveImageWithTags('./test')
+        return [selectedImages,"Ok"]
     except:
-        return [selectedImage,"Error"]
+        return [selectedImages,"Error"]
 
 def previousPage(curPage):
     return (curPage - 1) if curPage>1 else curPage
@@ -26,8 +38,8 @@ def previousPage(curPage):
 def nextPage(curPage):
     return (curPage + 1) if curPage<100 else curPage
 
-with gr.Blocks() as demo:
-    selectedImage = gr.State(None)
+with gr.Blocks(css=".test {background-color: red}") as demo:
+    selectedImages = gr.State([])
     with gr.Row(variant="compact"):
         with gr.Column():
             request = gr.Textbox(
@@ -45,7 +57,9 @@ with gr.Blocks() as demo:
             gallery = gr.Gallery(
                 label="Search results",
                 show_label=False,
-                elem_id='gallery').style(
+                elem_id='gallery',
+                elem_classes="test",
+                ).style(
                     columns=[4], rows=[4], object_fit='contain', height=300
                 )
             with gr.Row():
@@ -53,14 +67,14 @@ with gr.Blocks() as demo:
                 pageNumSlider = gr.Slider(1,100, step=1, label="Current page")
                 buttonNext = gr.Button("Next Page").style(full_width=False) #TODO
             
-    btnRequest.click(test, inputs=[request, pageNumSlider, imgCountSlider], outputs=[gallery])
-    btnDownload.click(downloadSelected, inputs=[selectedImage], outputs=[selectedImage, statusTexbox])
+    btnRequest.click(getPosts, inputs=[selectedImages, request, pageNumSlider, imgCountSlider], outputs=[selectedImages, gallery])
+    btnDownload.click(downloadSelected, inputs=[selectedImages], outputs=[selectedImages, statusTexbox])
     buttonPrev.click(previousPage, inputs=[pageNumSlider], outputs=[pageNumSlider])
     buttonNext.click(nextPage, inputs=[pageNumSlider], outputs=[pageNumSlider])
     gallery.select(
         fn=onSelect,
-        inputs=[selectedImage],
-        outputs=[selectedImage,testOnSelect]
+        inputs=[selectedImages],
+        outputs=[selectedImages,testOnSelect]
     )
     
 

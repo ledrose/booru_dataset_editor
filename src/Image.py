@@ -12,7 +12,7 @@ class Image:
         self.previewImageLink = previewImagelink
 
     def getImageTuple(self) -> tuple[str, str]:
-        return (self.previewImageLink, self.fullName)
+        return (self.imgLink, self.fullName)
 
     def saveImageWithTags(self, path: str) -> None:
         folder = pathlib.Path(path)
