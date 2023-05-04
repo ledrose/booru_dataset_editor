@@ -20,12 +20,12 @@ class Imageboard:
         self.inputTransform = inputTransform
         self.imgList = []
 
-    def requestImageSearch(self, searchInput: str) -> list[type(Image)]:
+    def requestImageSearch(self, searchInput: str, pageNum: int = 1, imgCount: int = 20) -> list[type(Image)]:
         searcgInput = self.inputTransform(searchInput)
         postsUrl = self.mainLink+'/posts.json'
         if (not self.isAuthenticated and self.user!=None):
             self.requestAuth()
-        payload = {"tags":searchInput}
+        payload = {"tags":searchInput, "page": pageNum, "limit": imgCount}
         response = requests.get(postsUrl, params=payload)
         if (response.status_code==200):
             data = response.json()
