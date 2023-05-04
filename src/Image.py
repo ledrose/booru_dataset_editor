@@ -7,7 +7,7 @@ class Image:
         self.imgLink = imgLink
         self.name = name
         self.ext = ext
-        self.fullName = '{}.{}'.format(self.name,self.ext)
+        self.fullName = f"{self.name}.{self.ext}"
         self.tags = tags
         self.previewImageLink = previewImagelink
 

@@ -50,8 +50,8 @@ class Imageboard:
     def getImageLinks(self) -> list[tuple[str, str]]:
         return [x.getImageTuple() for x in self.imgList]
 
-    def getImageWithId(self,id: int) -> type(Image):
-        return self.imgList[id]
+    def getImageWithName(self,fullName: str) -> type(Image):
+        return next(x for x in self.imgList if x.fullName==fullName)
 
     def requestAuth(self) -> None:
         if (self.user==None):
