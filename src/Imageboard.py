@@ -47,7 +47,10 @@ class Imageboard:
             raise Exception("Search was not succesful")
 
     def getImageLinks(self):
-        return [x.imgLink for x in self.imgList]
+        return [x.getImageTuple() for x in self.imgList]
+
+    def getImageWithId(self,id: int) -> type(Image):
+        return self.imgList[id]
 
     def requestAuth(self):
         if (self.user==None):
