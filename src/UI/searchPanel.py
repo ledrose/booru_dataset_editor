@@ -1,13 +1,14 @@
 from .singleton import Singleton
-from src import Imageboard
+from src import Imageboard, ImageGroup
 import gradio as gr
+
+testImageboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
 
 
 class SearchPanelUI(Singleton):
     def __init__(self):
         self.loadedImageboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
-        self.currentImage = None
-        # self.selectedImages = set()
+        self.loadedImages = ImageGroup()
 
     def createUI(self):
         with gr.Column():
@@ -30,27 +31,16 @@ class SearchPanelUI(Singleton):
                     self.curPageSlider = gr.Slider(1,100, step=1, label="Current page")
                     with gr.Row():
                         self.btnRequestPosts = gr.Button("Search").style(full_width=False)
-                        # self.btnTemp = gr.Button("Add to list").style(full_width=False)
 
-    def addCallbacks(self):
+    def addCallbacks(self, currentLoadedImage):
         def getPosts(searchInput, imgCount, pageNum):
-            self.loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum)
-            return self.loadedImageboard.getImageLinks()
+            self.loadedImages.images = self.loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum)
+            return self.loadedImages.getGalleryTuples()
         self.btnRequestPosts.click(
             fn=getPosts, inputs=[self.searchRequestTextbox, self.imgCountSlider, self.curPageSlider], outputs=[self.loadedImagesGallery]
         )
         def onGallerySelected(evt: gr.SelectData):
-            self.currentImage = evt.value
-            # infoStr = f"You selected {evt.value} at {evt.index} from {evt.target}"
-            # return None
-        self.loadedImagesGallery.select(fn=onGallerySelected,inputs=None, outputs=None, show_progress=True)
-        # def onBtnTmpClick():
-        #     if (self.currentImage==None):
-        #         return None
-        #     if self.currentImage in self.selectedImages:
-        #         self.selectedImages.remove(self.currentImage)
-        #         return None
-        #     self.selectedImages.add(self.currentImage)
-        #     return None
+            return self.loadedImages.getImageByFilename(evt.value)
 
-        # self.btnTemp.click(fn=onBtnTmpClick, inputs=[], outputs=[])
+        self.loadedImagesGallery.select(fn=onGallerySelected,inputs=None, outputs=[currentLoadedImage])
+        

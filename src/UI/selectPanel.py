@@ -1,9 +1,10 @@
 from .singleton import Singleton 
+from src.ImageGroup import ImageGroup
 import gradio as gr
 
 class SelectPanelUI(Singleton):
     def __init__(self):
-        self.selectedImages = set()
+        self.selectedImages = ImageGroup()
         self.currentImage = None
 
     def createUI(self):
@@ -22,20 +23,34 @@ class SelectPanelUI(Singleton):
                 self.btnDownload = gr.Button("Download")
 
 
-    def addCallbacks(self, addToSelect, removeFromSelected, downlaodImages):
-        self.btnAddToSelected.click(
-            fn=addToSelect, inputs=[], outputs=[self.selectedImagesGallery]
-        )
-        def onGallerySelected(evt: gr.SelectData):
-            self.currentImage = evt.value
+    def addCallbacks(self, currentLoadedImage):
+        def addToSelect(currentLoadedImage):
+            if (currentLoadedImage!=None):
+                self.selectedImages.add(currentLoadedImage)
+            return self.selectedImages.getGalleryTuples()
 
-        self.selectedImagesGallery.select(
-            fn=onGallerySelected, inputs=[], outputs=[]
+        self.btnAddToSelected.click(
+            fn=addToSelect, inputs=[currentLoadedImage], outputs=[self.selectedImagesGallery]
         )
+
+        def removeFromSelected():
+            if (self.currentImage!=None):
+                self.selectedImages.remove(self.currentImage)
+            return self.selectedImages.getGalleryTuples()
 
         self.btnRemoveFromSelected.click(
             fn=removeFromSelected, inputs=[], outputs=[self.selectedImagesGallery]
         )
+        def onGallerySelected(evt: gr.SelectData):
+            self.currentImage = self.selectedImages.getImageByFilename(evt.value)
+        
+        self.selectedImagesGallery.select(
+            fn=onGallerySelected, inputs=[], outputs=[]
+        )
+
+        def downloadImages(savePath):
+            self.selectedImages.downloadAll(savePath)
+
         self.btnDownload.click(
-            fn=downlaodImages,inputs=[self.savePathTextbox],outputs=[]
+            fn=downloadImages,inputs=[self.savePathTextbox],outputs=[]
         )

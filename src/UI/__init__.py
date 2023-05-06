@@ -1,1 +1,1 @@
-from .ui_instance import *
+from .ui_instances import *

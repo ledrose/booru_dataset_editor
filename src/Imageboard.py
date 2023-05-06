@@ -18,10 +18,9 @@ class Imageboard:
         if (login!=None and apiKey!=None):
             self.user = {'login': login, 'apiKey': apiKey}
         self.inputTransform = inputTransform
-        self.imgList = []
 
-    def requestImageSearch(self, searchInput: str, pageNum: int = 1, imgCount: int = 20) -> list[type(Image)]:
-        searcgInput = self.inputTransform(searchInput)
+    def requestImageSearch(self, searchInput: str, pageNum: int = 1, imgCount: int = 20) -> set[type(Image)]:
+        searchInput = self.inputTransform(searchInput)
         postsUrl = self.mainLink+'/posts.json'
         if (not self.isAuthenticated and self.user!=None):
             self.requestAuth()
@@ -29,10 +28,10 @@ class Imageboard:
         response = requests.get(postsUrl, params=payload)
         if (response.status_code==200):
             data = response.json()
-            imgList = []
+            imgSet = set()
             for img in data:
                 try:
-                    imgList.append(Image(
+                    imgSet.add(Image(
                         imageboardName=self.name,
                         name=img['md5'],
                         ext=img['file_ext'],
@@ -42,8 +41,7 @@ class Imageboard:
                     ))
                 except:
                     print("Image with id {} can't be parsed".format(str(img['id'])))
-            self.imgList = imgList
-            return imgList
+            return imgSet
         else:
             raise Exception("Search was not succesful")
 
