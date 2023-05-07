@@ -1,9 +1,10 @@
 from .searchPanel import SearchPanelUI
 from .selectPanel import SelectPanelUI
-# from .imageboardTab import ImageboardTabUI
+from .topPanel import TopPanelUI
 
 __all__ = [
     "SearchPanelUI",
-    "SelectPanelUI"
+    "SelectPanelUI",
+    "TopPanelUI"
     # "ImageboardTabUI"
 ]

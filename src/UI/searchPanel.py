@@ -7,7 +7,7 @@ testImageboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="le
 
 class SearchPanelUI(Singleton):
     def __init__(self):
-        self.loadedImageboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
+        # self.loadedImageboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
         self.loadedImages = ImageGroup()
 
     def createUI(self):
@@ -32,12 +32,13 @@ class SearchPanelUI(Singleton):
                     with gr.Row():
                         self.btnRequestPosts = gr.Button("Search").style(full_width=False)
 
-    def addCallbacks(self, currentLoadedImage):
-        def getPosts(searchInput, imgCount, pageNum):
-            self.loadedImages.images = self.loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum)
+    def addCallbacks(self, currentLoadedImage, loadedImageboard):
+        print(loadedImageboard)
+        def getPosts(loadedImageboard, searchInput, imgCount, pageNum):
+            self.loadedImages.images = loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum)
             return self.loadedImages.getGalleryTuples()
         self.btnRequestPosts.click(
-            fn=getPosts, inputs=[self.searchRequestTextbox, self.imgCountSlider, self.curPageSlider], outputs=[self.loadedImagesGallery]
+            fn=getPosts, inputs=[loadedImageboard, self.searchRequestTextbox, self.imgCountSlider, self.curPageSlider], outputs=[self.loadedImagesGallery]
         )
         def onGallerySelected(evt: gr.SelectData):
             return self.loadedImages.getImageByFilename(evt.value)

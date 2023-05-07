@@ -5,8 +5,10 @@ class ImageGroup:
         self.images = imgSet
 
     def getGalleryTuples(self):
-        return [x.getImageTuple() for x in self.images]
-
+        x = [x.getImageTuple() for x in self.images]
+        print(x)
+        return x
+        
     def getImageByFilename(self, filename: str):
         return next((x for x in iter(self.images) if x.fullName == filename), None)
 

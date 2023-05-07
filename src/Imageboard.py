@@ -1,4 +1,6 @@
 import requests
+from pypac import PACSession
+from pypac.parser import PACFile
 from collections.abc import Callable
 from requests.auth import HTTPBasicAuth
 from src.Image import Image
@@ -15,6 +17,12 @@ class Imageboard:
         self.postLink= mainLink + '/posts.json'
         self.isAuthenticated = False
         self.user = None
+
+        with open('proxy-ssl.js') as f:
+            pac = PACFile(f.read())
+        self.session = PACSession(pac)
+        self.session.headers.update({'user-agent':'ledrose_scrapper/0.0.1'})
+        
         if (login!=None and apiKey!=None):
             self.user = {'login': login, 'apiKey': apiKey}
         self.inputTransform = inputTransform
@@ -25,12 +33,14 @@ class Imageboard:
         if (not self.isAuthenticated and self.user!=None):
             self.requestAuth()
         payload = {"tags":searchInput, "page": pageNum, "limit": imgCount}
-        response = requests.get(postsUrl, params=payload)
+        response = self.session.get(postsUrl, params=payload)
         if (response.status_code==200):
+            print("Response_sc = 200")
             data = response.json()
             imgSet = set()
             for img in data:
                 try:
+                    print(img)
                     imgSet.add(Image(
                         imageboardName=self.name,
                         name=img['md5'],
@@ -41,6 +51,7 @@ class Imageboard:
                     ))
                 except:
                     print("Image with id {} can't be parsed".format(str(img['id'])))
+            print("returning")
             return imgSet
         else:
             raise Exception("Search was not succesful")
@@ -55,7 +66,7 @@ class Imageboard:
         if (self.user==None):
             return Exception("User info is missing")
         basicAuth =  HTTPBasicAuth(self.user['login'], self.user['apiKey'])
-        response = requests.get(self.authLink,auth=basicAuth)
+        response = self.session.get(self.authLink,auth=basicAuth)
         if (response.status_code==requests.codes.ok):
             if (response.json()['name']!=self.user['login']):
                 print("How?")

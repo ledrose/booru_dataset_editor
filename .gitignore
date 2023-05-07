@@ -1,4 +1,5 @@
 __pycache__
 venv
 test
+test.py
 gradio_test.py
