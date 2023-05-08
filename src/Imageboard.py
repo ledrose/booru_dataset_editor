@@ -17,10 +17,9 @@ class Imageboard:
         self.postLink= mainLink + '/posts.json'
         self.isAuthenticated = False
         self.user = None
-
-        with open('proxy-ssl.js') as f:
-            pac = PACFile(f.read())
-        self.session = PACSession(pac)
+        # with open('proxy-ssl.js') as f:
+        #     pac = PACFile(f.read())
+        self.session = requests.session()
         self.session.headers.update({'user-agent':'ledrose_scrapper/0.0.1'})
         
         if (login!=None and apiKey!=None):

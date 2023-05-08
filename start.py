@@ -6,9 +6,9 @@ from dataclasses import dataclass
 
 with gr.Blocks() as demo:
     currentLoadedImage = gr.State(None)
-    imageboard = gr.State(Imageboard("Danbooru", "https://danbooru.donmai.us", login="ledrose", apiKey="gBHJNPPPMAiy4HBzsS7RyyZk"))
     with gr.Column():
         topPanel.createUI()
+        imageboard = gr.State(topPanel.imageboardList[0])
         with gr.Row():
             searchPanel.createUI()
             selectPanel.createUI()

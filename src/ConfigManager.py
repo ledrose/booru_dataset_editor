@@ -25,5 +25,5 @@ class ConfigManager:
                                 "apiKey":imageboard.user['apiKey']
                             } if imageboard.user!=None else None
                             })
-        with open(filePath, 'w') as f:
+        with open(filePath, "w") as f:
             f.write(json.dumps((jsonList)))
