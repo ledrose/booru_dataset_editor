@@ -1,16 +1,15 @@
 from .singleton import Singleton
 from src import Imageboard
+from src.ConfigManager import ConfigManager
 import gradio as gr
 
 class TopPanelUI(Singleton):
     def __init__(self):
-        self.imageboardList = [
-            Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu"),
-            Imageboard("Danbooru", "https://danbooru.donmai.us", login="ledrose", apiKey="gBHJNPPPMAiy4HBzsS7RyyZk")
-        ]
+        self.imageboardList = ConfigManager.getImageboardsFromJson('imagebords.json')
 
     def createUI(self):
         self.selectImageboard = gr.Dropdown([x.name for x in self.imageboardList],multiselect=False, interactive=True,label="Выбор имиджборда", value="Testbooru")
+        self.saveImageboardsButton = gr.Button("Save Imageboards")
 
     def addCallbacks(self, imageboard):
         def changeImageboard(evt: gr.SelectData):
@@ -18,4 +17,10 @@ class TopPanelUI(Singleton):
             
         self.selectImageboard.select(
             fn=changeImageboard, inputs=[], outputs=[imageboard]
+        )
+        def saveImageboards():
+            ConfigManager.saveImageboardsToJson("imagebords.json", self.imageboardList)
+
+        self.saveImageboardsButton.click(
+            fn=saveImageboards, inputs=[], outputs=[]
         )
