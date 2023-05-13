@@ -44,9 +44,9 @@ class Imageboard:
                         imageboardName=self.name,
                         name=img['md5'],
                         ext=img['file_ext'],
-                        imgLink=img['large_file_url'], 
+                        imgLink=img['file_url'], 
                         tags=img['tag_string'].split(' '), 
-                        previewImagelink=img['preview_file_url'],
+                        previewImagelink=img['large_file_url'],
                     ))
                 except:
                     print("Image with id {} can't be parsed".format(str(img['id'])))

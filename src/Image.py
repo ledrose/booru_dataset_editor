@@ -22,7 +22,7 @@ class Image:
 
     def getImageObject(self):
         print(self.imgLink)
-        bytes = self.session.get(self.imgLink, stream=True).raw
+        bytes = self.session.get(self.previewImageLink, stream=True).raw
         img = PILImage.open(bytes)
         print(img)
         return img

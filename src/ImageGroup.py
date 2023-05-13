@@ -9,7 +9,7 @@ class ImageGroup:
         print(x)
         return x
         
-    def getImageByFilename(self, filename: str):
+    def getImageByFilename(self, filename: str) -> type(Image):
         return next((x for x in iter(self.images) if x.fullName == filename), None)
 
     def remove(self, img: type(Image)) -> None:

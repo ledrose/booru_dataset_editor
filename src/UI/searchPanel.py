@@ -3,6 +3,12 @@ from src import Imageboard, ImageGroup
 import gradio as gr
 
 testImageboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
+def getNewFileName(inp, filename, oldname):
+    out = []
+    for [img, name] in inp:
+        if (name==filename):
+            return img['name']
+    return oldname
 
 
 class SearchPanelUI(Singleton):
@@ -20,7 +26,7 @@ class SearchPanelUI(Singleton):
                 columns=[6], rows=[4], object_fit='contain', height=300
             )
             self.searchRequestTextbox = gr.Textbox(
-                label="Enter nyour search request",
+                label="Enter your search request",
                 show_label=False,
                 placeholder="Enter your search request",
                 max_lines=1
@@ -33,15 +39,17 @@ class SearchPanelUI(Singleton):
                         self.btnRequestPosts = gr.Button("Search").style(full_width=False)
 
     def addCallbacks(self, currentLoadedImage, loadedImageboard):
-        print(loadedImageboard)
         def getPosts(loadedImageboard, searchInput, imgCount, pageNum):
             self.loadedImages.images = loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum)
             return self.loadedImages.getGalleryTuples()
         self.btnRequestPosts.click(
             fn=getPosts, inputs=[loadedImageboard, self.searchRequestTextbox, self.imgCountSlider, self.curPageSlider], outputs=[self.loadedImagesGallery]
         )
-        def onGallerySelected(evt: gr.SelectData):
-            return self.loadedImages.getImageByFilename(evt.value)
+        def onGallerySelected(evt: gr.SelectData, loadedImagesGallery: list):
+            # print(getNewFileName(loadedImagesGallery, evt.value))
+            image = self.loadedImages.getImageByFilename(evt.value)
+            image.localFile = getNewFileName(loadedImagesGallery, evt.value, image.localFile)
+            return image
 
-        self.loadedImagesGallery.select(fn=onGallerySelected,inputs=None, outputs=[currentLoadedImage])
+        self.loadedImagesGallery.select(fn=onGallerySelected,inputs=[self.loadedImagesGallery], outputs=[currentLoadedImage])
         
