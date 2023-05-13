@@ -1,6 +1,10 @@
 from .Imageboard import Imageboard
+from pypac.parser import PACFile
+from pypac import PACSession
 import pathlib
+import requests
 import json
+
 
 class ConfigManager:
     @staticmethod

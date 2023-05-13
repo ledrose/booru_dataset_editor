@@ -13,13 +13,13 @@ class TopPanelUI(Singleton):
                 self.selectImageboard = gr.Dropdown([x.name for x in self.imageboardList],multiselect=False, interactive=True,label="Выбор имиджборда", value=self.imageboardList[0].name)
             with gr.Column(scale=3):
                 with gr.Accordion("Edit or add new imageboard", open=False):
-                    with gr.Row():
+                    with gr.Row(variant="panel"):
                         self.imageboardName = gr.Textbox(label="visible name", value=self.imageboardList[0].name)
                         self.imageboardMainLink  = gr.Textbox(label="main link", value=self.imageboardList[0].mainLink)
-                    with gr.Row():
-                        self.imageboardUsername = gr.Textbox(label="usename", value=self.imageboardList[0].user['login'] if self.imageboardList[0].user!=None else None)
+                    with gr.Row(variant="panel"):
+                        self.imageboardUsername = gr.Textbox(label="username", value=self.imageboardList[0].user['login'] if self.imageboardList[0].user!=None else None)
                         self.imageobardApiKey = gr.Textbox(label="api key", value=self.imageboardList[0].user['apiKey'] if self.imageboardList[0].user!=None else None)
-                    with gr.Row():
+                    with gr.Row(variant="panel"):
                         self.saveImageboardsButton = gr.Button("Update Imageboard")
                         self.deleteImageboardButton = gr.Button("Delete Imageboard")
                         self.addNewImageboardButton = gr.Button("Add new imageboard")

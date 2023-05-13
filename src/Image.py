@@ -1,18 +1,31 @@
 import requests
 import pathlib
+from PIL import Image as PILImage
 
 class Image:
-    def __init__(self, imageboardName: str, name: str, ext: str, imgLink: str, previewImagelink: str, tags: list[str] = []) -> None:
+    def __init__(self, session, imageboardName: str, name: str, ext: str, imgLink: str, previewImagelink: str, tags: list[str] = []) -> None:
         self.imageboardName = imageboardName
         self.imgLink = imgLink
         self.name = name
         self.ext = ext
         self.fullName = f"{self.name}.{self.ext}"
+        self.localFile = None
         self.tags = tags
         self.previewImageLink = previewImagelink
+        self.session = session
 
     def getImageTuple(self) -> tuple[str, str]:
-        return (self.imgLink, self.fullName)
+        if self.localFile==None:
+            return (self.getImageObject(), self.fullName)
+        else:
+            return (self.localFile, self.fullName)
+
+    def getImageObject(self):
+        print(self.imgLink)
+        bytes = self.session.get(self.imgLink, stream=True).raw
+        img = PILImage.open(bytes)
+        print(img)
+        return img
 
     def saveImageWithTags(self, path: str) -> None:
         folder = pathlib.Path(path)

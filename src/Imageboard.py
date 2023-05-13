@@ -1,10 +1,10 @@
 import requests
-from pypac import PACSession
-from pypac.parser import PACFile
 from collections.abc import Callable
 from requests.auth import HTTPBasicAuth
-from src.Image import Image
-
+from .Session import getSession
+from .Image import Image
+import pathlib
+        
 #TODO фабрика ииджбордов :Ъ
 def defaultInputTransform(searchInput: str) -> str:
     return searchInput.replace(' ', '+')
@@ -16,17 +16,16 @@ class Imageboard:
         self.authLink= mainLink + '/profile.json'
         self.postLink= mainLink + '/posts.json'
         self.isAuthenticated = False
+        self.session = None
         self.user = None
-        # with open('proxy-ssl.js') as f:
-        #     pac = PACFile(f.read())
-        self.session = requests.session()
-        self.session.headers.update({'user-agent':'ledrose_scrapper/0.0.1'})
-        
+        self.allowedExt = {'jpg','png','gif'}
         if (login!=None and apiKey!=None):
             self.user = {'login': login, 'apiKey': apiKey}
         self.inputTransform = inputTransform
 
     def requestImageSearch(self, searchInput: str, pageNum: int = 1, imgCount: int = 20) -> set[type(Image)]:
+        if (self.session==None):
+            self.session = getSession()
         searchInput = self.inputTransform(searchInput)
         postsUrl = self.mainLink+'/posts.json'
         if (not self.isAuthenticated and self.user!=None):
@@ -34,23 +33,23 @@ class Imageboard:
         payload = {"tags":searchInput, "page": pageNum, "limit": imgCount}
         response = self.session.get(postsUrl, params=payload)
         if (response.status_code==200):
-            print("Response_sc = 200")
             data = response.json()
             imgSet = set()
             for img in data:
                 try:
-                    print(img)
+                    if (not img['file_ext'] in self.allowedExt):
+                        raise ConnectionError("Not supported format")
                     imgSet.add(Image(
+                        session = self.session,
                         imageboardName=self.name,
                         name=img['md5'],
                         ext=img['file_ext'],
-                        imgLink=img['file_url'], 
+                        imgLink=img['large_file_url'], 
                         tags=img['tag_string'].split(' '), 
                         previewImagelink=img['preview_file_url'],
                     ))
                 except:
                     print("Image with id {} can't be parsed".format(str(img['id'])))
-            print("returning")
             return imgSet
         else:
             raise Exception("Search was not succesful")
@@ -74,8 +73,9 @@ class Imageboard:
 
 
 def main():
-    iboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
+    iboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="Jrz525bCrCMYmRv57CesvybP")
     images = iboard.requestImageSearch("1girl 1boy")
+    print(images)
     images[1].saveImageWithTags('./testFolder')
 
 if __name__ == "__main__":
