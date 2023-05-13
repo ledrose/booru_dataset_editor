@@ -32,11 +32,12 @@ class Image:
         if (not folder.is_dir()):
             folder.mkdir()
             
-        response = requests.get(self.imgLink)
+        response = self.session.get(self.imgLink)
         if (response.status_code!=requests.codes.ok):
             raise Exception("Failed to download image")
         imgFile = folder / self.fullName
         imgFile.touch(exist_ok=True)
+        print("Downloaded image")
         with open(imgFile,'wb') as fd:
             for chunk in response.iter_content(chunk_size=128):
                 fd.write(chunk)

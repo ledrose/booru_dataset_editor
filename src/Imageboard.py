@@ -6,50 +6,103 @@ from .Image import Image
 import pathlib
         
 #TODO фабрика ииджбордов :Ъ
-def defaultInputTransform(searchInput: str) -> str:
-    return searchInput.replace(' ', '+')
+
+
+class ImageboardFactory:
+    @staticmethod
+    def danbooruLike(name: str, mainLink: str, login: str = None, apiKey: str = None):
+        def inputTransform(searchInput: str) -> str:
+            return searchInput.replace(' ', '+')
+        def parseData(json):
+            return json
+        def parseImage(data):
+            return {
+                'name':data['md5'],
+                'ext':data['file_ext'],
+                'imgLink':data['file_url'], 
+                'tags':data['tag_string'].split(' '), 
+                'previewImagelink':data['large_file_url'],
+            }
+        def payloadCreator(searchInput, pageNum, limit):
+            return {"tags":searchInput, "page": pageNum, "limit": limit}
+        return Imageboard(name=name, mainLink=mainLink, type='danbooru', inputTransform=inputTransform, parseImage=parseImage, parseData=parseData, payloadCreator=payloadCreator, isApiKeyNeeded=True, login=login, apiKey=apiKey,
+                        authSublink='/profile.json', postsSublink='/posts.json')
+        
+    @staticmethod
+    def derpibooruLike(name: str, mainLink: str):
+        def inputTransform(str: str) -> str:
+            return str.replace('&&', 'AND').replace('||', 'OR')
+        def parseData(json):
+            return json['images']
+        def parseImage(data):
+            return {
+                'name':data['sha512_hash'],
+                'ext':data['format'],
+                'imgLink':data['representations']['full'], 
+                'tags':data['tags'], 
+                'previewImagelink':data['representations']['medium'],
+            }
+        def payloadCreator(searchInput, pageNum, limit):
+            return {"q":searchInput, "page": pageNum, "per_page": limit}
+        return Imageboard(name=name, mainLink=mainLink, type='derpibooru', inputTransform=inputTransform, parseImage=parseImage, parseData=parseData, payloadCreator=payloadCreator, isApiKeyNeeded=False,
+                        postsSublink='/api/v1/json/search/images')
+
+
+
 
 class Imageboard:
-    def __init__(self, name: str, mainLink: str, inputTransform: Callable[[str],str] = defaultInputTransform, login: str = None, apiKey: str = None) -> None:
+    def __init__(self, name: str, mainLink: str, type: str,
+                inputTransform: Callable[[str],str], postsSublink: str, parseData: Callable, parseImage: Callable, payloadCreator: Callable,
+                isApiKeyNeeded: bool = True, authSublink: str = None, login: str = None, apiKey: str = None) -> None:
         self.name = name
+        self.type = type
         self.mainLink = mainLink
-        self.authLink= mainLink + '/profile.json'
-        self.postLink= mainLink + '/posts.json'
-        self.isAuthenticated = False
+        self.postLink= mainLink + postsSublink
         self.session = None
-        self.user = None
+        self.parseData = parseData
+        self.parseImage = parseImage
+        self.payloadCreator = payloadCreator
         self.allowedExt = {'jpg','png','gif'}
-        if (login!=None and apiKey!=None):
-            self.user = {'login': login, 'apiKey': apiKey}
+        
+        if (isApiKeyNeeded):
+            self.authLink= mainLink + authSublink
+            self.isAuthenticated = False
+            self.user = None
+            if (login!=None and apiKey!=None):
+                self.user = {'login': login, 'apiKey': apiKey}
+        else:
+            self.isAuthenticated = True
+            self.user = None
         self.inputTransform = inputTransform
 
     def requestImageSearch(self, searchInput: str, pageNum: int = 1, imgCount: int = 20) -> set[type(Image)]:
         if (self.session==None):
             self.session = getSession()
         searchInput = self.inputTransform(searchInput)
-        postsUrl = self.mainLink+'/posts.json'
         if (not self.isAuthenticated and self.user!=None):
             self.requestAuth()
-        payload = {"tags":searchInput, "page": pageNum, "limit": imgCount}
-        response = self.session.get(postsUrl, params=payload)
+        response = self.session.get(self.postLink, params=self.payloadCreator(searchInput, pageNum, imgCount))
         if (response.status_code==200):
             data = response.json()
+            # print(data)
             imgSet = set()
-            for img in data:
+            for img in self.parseData(data):
                 try:
-                    if (not img['file_ext'] in self.allowedExt):
+                    img = self.parseImage(img)
+                    print(img)
+                    if (not img['ext'] in self.allowedExt):
                         raise ConnectionError("Not supported format")
                     imgSet.add(Image(
                         session = self.session,
                         imageboardName=self.name,
-                        name=img['md5'],
-                        ext=img['file_ext'],
-                        imgLink=img['file_url'], 
-                        tags=img['tag_string'].split(' '), 
-                        previewImagelink=img['large_file_url'],
+                        name=img['name'],
+                        ext=img['ext'],
+                        imgLink=img['imgLink'], 
+                        tags=img['tags'], 
+                        previewImagelink=img['previewImagelink'],
                     ))
                 except:
-                    print("Image with id {} can't be parsed".format(str(img['id'])))
+                    print("Image with name {} can't be parsed".format(str(img['name'])))
             return imgSet
         else:
             raise Exception("Search was not succesful")
@@ -61,14 +114,13 @@ class Imageboard:
         return next(x for x in self.imgList if x.fullName==filename)
 
     def requestAuth(self) -> None:
+        if (self.authLink==None):
+            return Exception("Authentication is not supported on this type of Imageboard")
         if (self.user==None):
             return Exception("User info is missing")
         basicAuth =  HTTPBasicAuth(self.user['login'], self.user['apiKey'])
         response = self.session.get(self.authLink,auth=basicAuth)
-        if (response.status_code==requests.codes.ok):
-            if (response.json()['name']!=self.user['login']):
-                print("How?")
-        else:
+        if (response.status_code!=requests.codes.ok):
             raise Exception("Auth is not succesful")
 
 

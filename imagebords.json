@@ -1,1 +1,1 @@
-[{"name": "TestBooru", "mainLink": "https://testbooru.donmai.us", "user": null}, {"name": "danbooru", "mainLink": "https://danbooru.donmai.us", "user": {"login": "ledrose", "apiKey": "NLCsLC8c4Ut5W2Ss7jdezZZc"}}]
+[{"name": "TestBooru", "type": "danbooru", "mainLink": "https://testbooru.donmai.us", "user": null}, {"name": "danbooru", "type":"danbooru", "mainLink": "https://danbooru.donmai.us", "user": {"login": "ledrose", "apiKey": "nQzSKgnAVZdoSgVXBvqN52fb"}},{"name": "derpibooru", "type":"derpibooru", "mainLink": "https://derpibooru.org", "user": null}]

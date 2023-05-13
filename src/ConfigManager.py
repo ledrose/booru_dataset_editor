@@ -1,4 +1,4 @@
-from .Imageboard import Imageboard
+from .Imageboard import ImageboardFactory, Imageboard
 from pypac.parser import PACFile
 from pypac import PACSession
 import pathlib
@@ -11,11 +11,14 @@ class ConfigManager:
     def getImageboardsFromJson(filePath: str):
         with open(filePath, 'r') as f:
             config = json.load(f)
-        return [Imageboard(
-            name=x['name'],
-            mainLink=x['mainLink'],
-            login=x['user']['login'] if x['user']!=None else None,
-            apiKey=x['user']['apiKey'] if x['user']!=None else None)
+        return [ImageboardFactory.danbooruLike(
+                    name=x['name'],
+                    mainLink=x['mainLink'],
+                    login=x['user']['login'] if x['user']!=None else None,
+                    apiKey=x['user']['apiKey'] if x['user']!=None else None) if x['type']=='danbooru' else
+                ImageboardFactory.derpibooruLike(
+                    name=x['name'], 
+                    mainLink=x['mainLink'])
             for x in config]
 
     @staticmethod
@@ -23,6 +26,7 @@ class ConfigManager:
         jsonList = []
         for imageboard in imageboardList:
             jsonList.append({"name":imageboard.name,
+                            "type": imageboard.type,
                             "mainLink":imageboard.mainLink,
                             "user": {
                                 "login":imageboard.user['login'],

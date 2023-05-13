@@ -2,7 +2,6 @@ from .singleton import Singleton
 from src import Imageboard, ImageGroup
 import gradio as gr
 
-testImageboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
 def getNewFileName(inp, filename, oldname):
     out = []
     for [img, name] in inp:
