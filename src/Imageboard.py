@@ -7,6 +7,7 @@ import pathlib
 
 
 class ImageboardFactory:
+
     @staticmethod
     def danbooruLike(name: str, mainLink: str, login: str = None, apiKey: str = None):
         def inputTransform(searchInput: str) -> str:
@@ -91,7 +92,8 @@ class Imageboard:
             self.isAuthenticated = False
             self.user = None
             if (login!=None and apiKey!=None):
-                self.user = {'login': login, 'apiKey': apiKey}
+                if (login.strip()!='' and apiKey.strip()!=''):
+                    self.user = {'login': login, 'apiKey': apiKey}
         else:
             self.isAuthenticated = True
             self.user = None
@@ -124,7 +126,7 @@ class Imageboard:
                         previewImagelink=img['previewImagelink'],
                     ))
                 except:
-                    print("Image with name {} can't be parsed".format(str(img['name'])))
+                    print("Image can't be parsed")
             return imgSet
         else:
             raise Exception("Search was not succesful")
