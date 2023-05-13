@@ -37,8 +37,9 @@ class SearchPanelUI(Singleton):
                     self.curPageSlider = gr.Slider(1,100, step=1, label="Current page")
                     with gr.Row():
                         self.btnRequestPosts = gr.Button("Search").style(full_width=False)
+                        self.btnQuickDownload = gr.Button("Quick Download").style(full_width=False)
 
-    def addCallbacks(self, currentLoadedImage, loadedImageboard):
+    def addCallbacks(self, currentLoadedImage, loadedImageboard, savePathTextbox):
         def getPosts(loadedImageboard, searchInput, imgCount, pageNum):
             self.loadedImages.images = loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum)
             return self.loadedImages.getGalleryTuples()
@@ -48,8 +49,16 @@ class SearchPanelUI(Singleton):
         def onGallerySelected(evt: gr.SelectData, loadedImagesGallery: list):
             # print(getNewFileName(loadedImagesGallery, evt.value))
             image = self.loadedImages.getImageByFilename(evt.value)
-            image.localFile = getNewFileName(loadedImagesGallery, evt.value, image.localFile)
+            image.localFile = getNewFileName(loadedImagesGallery, evt.value, None)
             return image
 
         self.loadedImagesGallery.select(fn=onGallerySelected,inputs=[self.loadedImagesGallery], outputs=[currentLoadedImage])
+
+        def quickDownload(loadedImageboard, searchInput, imgCount, pageNum, savepath):
+            qdImages = ImageGroup(loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum))
+            qdImages.downloadAll(savepath)
+
+        self.btnQuickDownload.click(
+            fn=quickDownload, inputs=[loadedImageboard, self.searchRequestTextbox, self.imgCountSlider, self.curPageSlider, savePathTextbox], outputs = None
+        )
         

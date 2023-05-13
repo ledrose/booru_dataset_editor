@@ -13,7 +13,7 @@ with gr.Blocks() as demo:
             searchPanel.createUI()
             selectPanel.createUI()
     topPanel.addCallbacks(imageboard)
-    searchPanel.addCallbacks(currentLoadedImage, imageboard)
+    searchPanel.addCallbacks(currentLoadedImage, imageboard, selectPanel.savePathTextbox)
     selectPanel.addCallbacks(currentLoadedImage)
     
 if __name__ == "__main__":
