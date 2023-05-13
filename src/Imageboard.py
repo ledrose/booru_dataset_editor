@@ -4,8 +4,6 @@ from requests.auth import HTTPBasicAuth
 from .Session import getSession
 from .Image import Image
 import pathlib
-        
-#TODO фабрика ииджбордов :Ъ
 
 
 class ImageboardFactory:
@@ -29,7 +27,7 @@ class ImageboardFactory:
                         authSublink='/profile.json', postsSublink='/posts.json')
         
     @staticmethod
-    def derpibooruLike(name: str, mainLink: str):
+    def derpibooruLike(name: str, mainLink: str, login: str = None, apiKey: str = None):
         def inputTransform(str: str) -> str:
             return str.replace('&&', 'AND').replace('||', 'OR')
         def parseData(json):
@@ -46,7 +44,31 @@ class ImageboardFactory:
             return {"q":searchInput, "page": pageNum, "per_page": limit}
         return Imageboard(name=name, mainLink=mainLink, type='derpibooru', inputTransform=inputTransform, parseImage=parseImage, parseData=parseData, payloadCreator=payloadCreator, isApiKeyNeeded=False,
                         postsSublink='/api/v1/json/search/images')
+    
+    @staticmethod
+    def gelbooruLike(name: str, mainLink: str, login: str = None, apiKey: str = None):
+        def inputTransform(str: str) -> str:
+            return str.replace(',', '+')
+        def parseData(json):
+            return json['post']
+        def parseImage(data):
+            return {
+                'name':data['md5'],
+                'ext':data['image'].replace(data['md5']+'.',''),
+                'imgLink':data['file_url'], 
+                'tags': ' '.split(data['tags']), 
+                'previewImagelink':data['preview_url'],
+            }
+        def payloadCreator(searchInput, pageNum, limit):
+            return {"tags":searchInput, "pid": pageNum, "limit": limit, 'json': 1, 'page':'dapi','s':'post','q':'index'}
+        return Imageboard(name=name, mainLink=mainLink, type='gelbooru', inputTransform=inputTransform, parseImage=parseImage, parseData=parseData, payloadCreator=payloadCreator, isApiKeyNeeded=False,
+                        postsSublink='/index.php?page=dapi&s=post&q=index')
 
+factoryDict = {
+    'danbooru': ImageboardFactory.danbooruLike,
+    'derpibooru': ImageboardFactory.derpibooruLike,
+    'gelbooru': ImageboardFactory.gelbooruLike
+}        
 
 
 
