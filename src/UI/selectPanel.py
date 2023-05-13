@@ -36,7 +36,7 @@ class SelectPanelUI(Singleton):
 
         def removeFromSelected():
             if (self.currentImage!=None):
-                self.selectedImages.remove(self.currentImage)
+                self.currentImage = self.selectedImages.remove(self.currentImage)
             return self.selectedImages.getGalleryTuples()
 
         self.btnRemoveFromSelected.click(
