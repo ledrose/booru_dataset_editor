@@ -9,7 +9,6 @@ def getNewFileName(inp, filename, oldname):
             return img['name']
     return oldname
 
-
 class SearchPanelUI(Singleton):
     def __init__(self):
         # self.loadedImageboard = Imageboard("TestBooru", "https://testbooru.donmai.us",login="ledrose", apiKey="GoS7hezv4reRL92oU4R2fLuu")
@@ -41,15 +40,17 @@ class SearchPanelUI(Singleton):
 
     def addCallbacks(self, currentLoadedImage, loadedImageboard, savePathTextbox):
         def getPosts(loadedImageboard, searchInput, imgCount, pageNum, progress=gr.Progress(track_tqdm=True)):
-            print('ok')
             self.loadedImages.images = loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum)
-            return self.loadedImages.getGalleryTuples(progress=progress)
+            return self.loadedImages.getGalleryTuples()
+        def fixImageNames(inp):
+            for image in self.loadedImages.images:
+                image.localFile = getNewFileName(inp, image.fullName, None)
+            print([x.localFile for x in self.loadedImages.images])
         self.btnRequestPosts.click(
             fn=getPosts, inputs=[loadedImageboard, self.searchRequestTextbox, self.imgCountSlider, self.curPageSlider], outputs=[self.loadedImagesGallery]
-        )
-        def onGallerySelected(evt: gr.SelectData, loadedImagesGallery: list):
+        ).then(fn=fixImageNames, inputs=[self.loadedImagesGallery], outputs=[])
+        def onGallerySelected(evt: gr.SelectData):
             image = self.loadedImages.getImageByFilename(evt.value)
-            image.localFile = getNewFileName(loadedImagesGallery, evt.value, None)
             markdownText = f"""
             **Selected Image Info:** \n
             Filename: {image.fullName} \n
@@ -58,7 +59,7 @@ class SearchPanelUI(Singleton):
             """
             return [image, markdownText]
 
-        self.loadedImagesGallery.select(fn=onGallerySelected,inputs=[self.loadedImagesGallery], outputs=[currentLoadedImage,self.markdownImageInfo])
+        self.loadedImagesGallery.select(fn=onGallerySelected,inputs=[], outputs=[currentLoadedImage, self.markdownImageInfo])
 
         # def quickDownload(loadedImageboard, searchInput, imgCount, pageNum, savepath):
         #     qdImages = ImageGroup(loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum))

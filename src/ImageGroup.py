@@ -6,11 +6,8 @@ class ImageGroup:
     def __init__(self, imgSet: set[type(Image)] = set()):
         self.images = imgSet
 
-    def getGalleryTuples(self, progress=None):
-        if (progress==None):
-            return [x.getImageTuple() for x in self.images]
-        else:
-            return [x.getImageTuple() for x in progress.tqdm(iter(self.images), unit="images loaded", total=len(self.images), desc="Loading Images")]
+    def getGalleryTuples(self):
+        return [x.getImageTuple() for x in tqdm.tqdm(self.images, unit="images loaded", desc="Loading Images")]
         
     def getImageByFilename(self, filename: str) -> type(Image):
         return next((x for x in iter(self.images) if x.fullName == filename), None)
