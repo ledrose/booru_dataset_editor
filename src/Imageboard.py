@@ -81,6 +81,7 @@ class Imageboard:
         self.type = type
         self.mainLink = mainLink
         self.postLink= mainLink + postsSublink
+        self.isApiKeyNeeded = isApiKeyNeeded
         self.session = None
         self.parseData = parseData
         self.parseImage = parseImage

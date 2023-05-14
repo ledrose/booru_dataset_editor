@@ -18,8 +18,8 @@ class TopPanelUI(Singleton):
                         self.imageboardMainLink  = gr.Textbox(label="main link", value=self.imageboardList[0].mainLink)
                     with gr.Row(variant="panel"):
                         self.imageboardTypeList = gr.Dropdown(label="Imageboard type", interactive=True, choices=factoryDict.keys(), value=self.imageboardList[0].type)
-                        self.imageboardUsername = gr.Textbox(label="username", value=self.imageboardList[0].user['login'] if self.imageboardList[0].user!=None else "")
-                        self.imageobardApiKey = gr.Textbox(label="api key", value=self.imageboardList[0].user['apiKey'] if self.imageboardList[0].user!=None else "")
+                        self.imageboardUsername = gr.Textbox(label="username",  visible=self.imageboardList[0].isApiKeyNeeded, value=self.imageboardList[0].user['login'] if self.imageboardList[0].user!=None else "")
+                        self.imageboardApiKey = gr.Textbox(label="api key", visible=self.imageboardList[0].isApiKeyNeeded, value=self.imageboardList[0].user['apiKey'] if self.imageboardList[0].user!=None else "")
                     with gr.Row(variant="panel"):
                         self.saveImageboardsButton = gr.Button("Update Imageboard")
                         self.deleteImageboardButton = gr.Button("Delete Imageboard")
@@ -29,10 +29,12 @@ class TopPanelUI(Singleton):
     def addCallbacks(self, imageboard):
         def changeImageboard(evt: gr.SelectData):
             imgboard = self.imageboardList[evt.index]
-            return [imgboard, imgboard.type, imgboard.name, imgboard.mainLink, imgboard.user['login'] if imgboard.user!=None else "", imgboard.user['apiKey'] if imgboard.user!=None else ""]
+            userUpd = gr.Textbox().update(value=imgboard.user['login'] if imgboard.user!=None else "", visible=imgboard.isApiKeyNeeded)
+            apiKeyUpd = gr.Textbox().update(value=imgboard.user['login'] if imgboard.user!=None else "", visible=imgboard.isApiKeyNeeded)
+            return [imgboard, imgboard.type, imgboard.name, imgboard.mainLink, userUpd, apiKeyUpd]
 
         self.selectImageboard.select(
-            fn=changeImageboard, inputs=[], outputs=[imageboard, self.imageboardTypeList, self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageobardApiKey]
+            fn=changeImageboard, inputs=[], outputs=[imageboard, self.imageboardTypeList, self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageboardApiKey]
         )
         def saveImageboards():
             ConfigManager.saveImageboardsToJson("imagebords.json", self.imageboardList)
@@ -46,7 +48,7 @@ class TopPanelUI(Singleton):
             return gr.Dropdown.update(choices=[x.name for x in self.imageboardList])
         
         self.addNewImageboardButton.click(
-            fn=addNewImageboard, inputs=[self.imageboardTypeList, self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageobardApiKey], outputs=[self.selectImageboard]
+            fn=addNewImageboard, inputs=[self.imageboardTypeList, self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageboardApiKey], outputs=[self.selectImageboard]
         )
         def deleteImageboard(imgboard, type, selectImgboard, name, mainLink, username, apiKey):
             if (len(self.imageboardList)<=1):
@@ -60,8 +62,8 @@ class TopPanelUI(Singleton):
 
         self.deleteImageboardButton.click(
             fn=deleteImageboard, 
-            inputs=[imageboard, self.imageboardTypeList, self.selectImageboard,self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageobardApiKey], 
-            outputs=[imageboard, self.imageboardTypeList, self.selectImageboard,self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageobardApiKey]
+            inputs=[imageboard, self.imageboardTypeList, self.selectImageboard,self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageboardApiKey], 
+            outputs=[imageboard, self.imageboardTypeList, self.selectImageboard,self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageboardApiKey]
         )
 
         def updateImageboard(imageboard, type, imageboardList, name, mainLink, username: str, apiKey):
@@ -74,9 +76,11 @@ class TopPanelUI(Singleton):
             self.imageboardList.insert(i, newImgboard)
             self.imageboardList.pop(i+1)
             ConfigManager.saveImageboardsToJson('imagebords.json', self.imageboardList)
-            return [newImgboard, gr.Dropdown.update(value=self.imageboardList[i].name, choices=[x.name for x in self.imageboardList])]
+            userUpd = gr.Textbox().update(visible=newImgboard.isApiKeyNeeded)
+            apiKeyUpd = gr.Textbox().update(visible=newImgboard.isApiKeyNeeded)
+            return [newImgboard, gr.Dropdown.update(value=self.imageboardList[i].name, choices=[x.name for x in self.imageboardList]), userUpd, apiKeyUpd]
 
         self.saveImageboardsButton.click(
-            fn=updateImageboard, inputs=[imageboard, self.imageboardTypeList, self.selectImageboard,self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageobardApiKey],
-            outputs=[imageboard, self.selectImageboard]
+            fn=updateImageboard, inputs=[imageboard, self.imageboardTypeList, self.selectImageboard,self.imageboardName,self.imageboardMainLink, self.imageboardUsername, self.imageboardApiKey],
+            outputs=[imageboard, self.selectImageboard, self.imageboardUsername, self.imageboardApiKey]
         )  
