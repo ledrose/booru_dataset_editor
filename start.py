@@ -4,7 +4,7 @@ from src.UI import *
 from dataclasses import dataclass
 
 
-with gr.Blocks() as demo:
+with gr.Blocks().queue() as demo:
     currentLoadedImage = gr.State(None)
     with gr.Column():
         topPanel.createUI()

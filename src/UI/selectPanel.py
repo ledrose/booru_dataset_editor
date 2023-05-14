@@ -66,9 +66,10 @@ class SelectPanelUI(Singleton):
             fn=onGallerySelected, inputs=[], outputs=[]
         )
 
-        def downloadImages(savePath):
+        def downloadImages(savePath, progress=gr.Progress(track_tqdm=True)):
             self.selectedImages.downloadAll(savePath)
+            return savePath
 
         self.btnDownload.click(
-            fn=downloadImages,inputs=[self.savePathTextbox],outputs=[]
+            fn=downloadImages,inputs=[self.savePathTextbox],outputs=[self.savePathTextbox]
         )

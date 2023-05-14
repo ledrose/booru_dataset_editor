@@ -40,9 +40,10 @@ class SearchPanelUI(Singleton):
                         # self.btnQuickDownload = gr.Button("Quick Download").style(full_width=False)
 
     def addCallbacks(self, currentLoadedImage, loadedImageboard, savePathTextbox):
-        def getPosts(loadedImageboard, searchInput, imgCount, pageNum):
+        def getPosts(loadedImageboard, searchInput, imgCount, pageNum, progress=gr.Progress(track_tqdm=True)):
+            print('ok')
             self.loadedImages.images = loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum)
-            return self.loadedImages.getGalleryTuples()
+            return self.loadedImages.getGalleryTuples(progress=progress)
         self.btnRequestPosts.click(
             fn=getPosts, inputs=[loadedImageboard, self.searchRequestTextbox, self.imgCountSlider, self.curPageSlider], outputs=[self.loadedImagesGallery]
         )
