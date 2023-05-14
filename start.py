@@ -14,7 +14,7 @@ with gr.Blocks() as demo:
             selectPanel.createUI()
     topPanel.addCallbacks(imageboard)
     searchPanel.addCallbacks(currentLoadedImage, imageboard, selectPanel.savePathTextbox)
-    selectPanel.addCallbacks(currentLoadedImage)
+    selectPanel.addCallbacks(currentLoadedImage, searchPanel.loadedImages)
     
 if __name__ == "__main__":
     demo.launch()
