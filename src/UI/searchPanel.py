@@ -36,6 +36,7 @@ class SearchPanelUI(Singleton):
                     self.curPageSlider = gr.Slider(1,100, step=1, label="Current page")
                     with gr.Row():
                         self.btnRequestPosts = gr.Button("Search").style(full_width=False)
+                    self.markdownImageInfo = gr.Markdown(value="**Selected Image Info:**")
                         # self.btnQuickDownload = gr.Button("Quick Download").style(full_width=False)
 
     def addCallbacks(self, currentLoadedImage, loadedImageboard, savePathTextbox):
@@ -46,12 +47,17 @@ class SearchPanelUI(Singleton):
             fn=getPosts, inputs=[loadedImageboard, self.searchRequestTextbox, self.imgCountSlider, self.curPageSlider], outputs=[self.loadedImagesGallery]
         )
         def onGallerySelected(evt: gr.SelectData, loadedImagesGallery: list):
-            # print(getNewFileName(loadedImagesGallery, evt.value))
             image = self.loadedImages.getImageByFilename(evt.value)
             image.localFile = getNewFileName(loadedImagesGallery, evt.value, None)
-            return image
+            markdownText = f"""
+            **Selected Image Info:** \n
+            Filename: {image.fullName} \n
+            Image link: {image.imgLink} \n
+            Tags: {' '.join(image.tags)}
+            """
+            return [image, markdownText]
 
-        self.loadedImagesGallery.select(fn=onGallerySelected,inputs=[self.loadedImagesGallery], outputs=[currentLoadedImage])
+        self.loadedImagesGallery.select(fn=onGallerySelected,inputs=[self.loadedImagesGallery], outputs=[currentLoadedImage,self.markdownImageInfo])
 
         # def quickDownload(loadedImageboard, searchInput, imgCount, pageNum, savepath):
         #     qdImages = ImageGroup(loadedImageboard.requestImageSearch(searchInput=searchInput,imgCount=imgCount, pageNum=pageNum))
