@@ -36,14 +36,14 @@ class Image:
         response = self.session.get(self.imgLink)
         if (response.status_code!=requests.codes.ok):
             raise Exception("Failed to download image")
-        imgFile = folder / (self.downloadName+self.ext)
+        imgFile = folder / f'{self.downloadName}.{self.ext}'
         imgFile.touch(exist_ok=True)
         print("Downloaded image")
         with open(imgFile,'wb') as fd:
             for chunk in response.iter_content(chunk_size=128):
                 fd.write(chunk)
 
-        textFile = folder / "{}.txt".format(self.name)
+        textFile = folder / f"{self.downloadName}.txt"
         textFile.touch(exist_ok=True)
         textFile.write_text(' '.join(self.tags))
 

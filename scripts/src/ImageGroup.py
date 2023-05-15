@@ -1,4 +1,5 @@
 from scripts.src.Image import Image
+from scripts.src.PatternParser import parsePattern
 import gradio as gr
 import tqdm
 
@@ -25,6 +26,8 @@ class ImageGroup:
         self.images.add(img)
         return img
 
-    def downloadAll(self,path: str) -> None:
-        for img in tqdm.tqdm(self.images):
+    def downloadAll(self,path: str, pattern) -> None:
+        pattern = parsePattern(pattern)
+        for ind, img in tqdm.tqdm(enumerate(self.images)):
+            img.downloadName = pattern(ind, img)
             img.saveImageWithTags(path)

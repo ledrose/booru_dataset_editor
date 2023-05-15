@@ -14,10 +14,10 @@ class SelectPanelUI(Singleton):
                 show_label=True,
                 elem_id='selected_gallery',
             ).style(
-                columns=6, rows=4, height=300,
+                columns=6, rows=2, height=300,
             )
             self.savePathTextbox = gr.Textbox(label="Save folder", value='test')
-            self.namePatternTexbox = gr.Textbox(label="NamePattern", value='<name>_<index=0>')
+            self.namePatternTexbox = gr.Textbox(label="NamePattern", value='<index>_<name>')
             # self.tagSelectionGroup = gr.CheckboxGroup(["character","copyright","artist","meta"])
             with gr.Row():
                 self.btnAddToSelected = gr.Button("Add").style(full_width=False)
@@ -67,10 +67,10 @@ class SelectPanelUI(Singleton):
             fn=onGallerySelected, inputs=[], outputs=[]
         )
 
-        def downloadImages(savePath, progress=gr.Progress(track_tqdm=True)):
-            self.selectedImages.downloadAll(savePath)
+        def downloadImages(savePath, namePattern, progress=gr.Progress(track_tqdm=True)):
+            self.selectedImages.downloadAll(savePath, namePattern)
             return savePath
 
         self.btnDownload.click(
-            fn=downloadImages,inputs=[self.savePathTextbox],outputs=[self.savePathTextbox]
+            fn=downloadImages,inputs=[self.savePathTextbox, self.namePatternTexbox],outputs=[self.savePathTextbox]
         )
