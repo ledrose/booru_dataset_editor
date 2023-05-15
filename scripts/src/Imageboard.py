@@ -114,7 +114,7 @@ class Imageboard:
             for img in self.parseData(data):
                 try:
                     img = self.parseImage(img)
-                    print(img)
+                    # print(img)
                     if (not img['ext'] in self.allowedExt):
                         raise ConnectionError("Not supported format")
                     imgSet.add(Image(
@@ -139,6 +139,7 @@ class Imageboard:
         return next(x for x in self.imgList if x.fullName==filename)
 
     def requestAuth(self) -> None:
+        print('Auth is in progress')
         if (self.authLink==None):
             return Exception("Authentication is not supported on this type of Imageboard")
         if (self.user==None):

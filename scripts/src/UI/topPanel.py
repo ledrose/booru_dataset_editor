@@ -29,7 +29,7 @@ class TopPanelUI(Singleton):
         def changeImageboard(evt: gr.SelectData):
             imgboard = self.imageboardList[evt.index]
             userUpd = gr.Textbox().update(value=imgboard.user['login'] if imgboard.user!=None else "", visible=imgboard.isApiKeyNeeded)
-            apiKeyUpd = gr.Textbox().update(value=imgboard.user['login'] if imgboard.user!=None else "", visible=imgboard.isApiKeyNeeded)
+            apiKeyUpd = gr.Textbox().update(value=imgboard.user['apiKey'] if imgboard.user!=None else "", visible=imgboard.isApiKeyNeeded)
             return [imgboard, imgboard.type, imgboard.name, imgboard.mainLink, userUpd, apiKeyUpd]
 
         self.selectImageboard.select(

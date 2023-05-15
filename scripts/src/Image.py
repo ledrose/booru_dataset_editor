@@ -7,6 +7,7 @@ class Image:
         self.imageboardName = imageboardName
         self.imgLink = imgLink
         self.name = name
+        self.downloadName = name
         self.ext = ext
         self.fullName = f"{self.name}.{self.ext}"
         self.localFile = None
@@ -35,7 +36,7 @@ class Image:
         response = self.session.get(self.imgLink)
         if (response.status_code!=requests.codes.ok):
             raise Exception("Failed to download image")
-        imgFile = folder / self.fullName
+        imgFile = folder / (self.downloadName+self.ext)
         imgFile.touch(exist_ok=True)
         print("Downloaded image")
         with open(imgFile,'wb') as fd:

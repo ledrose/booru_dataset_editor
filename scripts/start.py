@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 
 def start():
+# with gr.Blocks().queue() as demo:
     currentLoadedImage = gr.State(None)
     with gr.Column():
         topPanel.createUI()
@@ -15,6 +16,7 @@ def start():
     topPanel.addCallbacks(imageboard)
     searchPanel.addCallbacks(currentLoadedImage, imageboard, selectPanel.savePathTextbox)
     selectPanel.addCallbacks(currentLoadedImage, searchPanel.loadedImages)
-    
+
+
 if __name__ == "__main__":
     demo.launch()

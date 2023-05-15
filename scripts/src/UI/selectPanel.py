@@ -17,6 +17,7 @@ class SelectPanelUI(Singleton):
                 columns=6, rows=4, height=300,
             )
             self.savePathTextbox = gr.Textbox(label="Save folder", value='test')
+            self.namePatternTexbox = gr.Textbox(label="NamePattern", value='<name>_<index=0>')
             # self.tagSelectionGroup = gr.CheckboxGroup(["character","copyright","artist","meta"])
             with gr.Row():
                 self.btnAddToSelected = gr.Button("Add").style(full_width=False)

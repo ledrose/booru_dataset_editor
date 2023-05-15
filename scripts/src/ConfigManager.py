@@ -11,7 +11,7 @@ class ConfigManager:
     @staticmethod
     def getImageboardsFromJson(filePath: str):
         try:
-            with open(filePath, 'wr+') as f:
+            with open(filePath, 'r') as f:
                 config = json.load(f)
         except:
             config = json.loads(defaultImageboards)
