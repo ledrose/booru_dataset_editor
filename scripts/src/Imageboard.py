@@ -1,8 +1,8 @@
 import requests
 from collections.abc import Callable
 from requests.auth import HTTPBasicAuth
-from .Session import getSession
-from .Image import Image
+from scripts.src.Session import getSession
+from scripts.src.Image import Image
 import pathlib
 
 

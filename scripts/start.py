@@ -1,10 +1,10 @@
 import gradio as gr
-from src import *
-from src.UI import *
+from scripts.src import *
+from scripts.src.UI import *
 from dataclasses import dataclass
 
 
-with gr.Blocks().queue() as demo:
+def start():
     currentLoadedImage = gr.State(None)
     with gr.Column():
         topPanel.createUI()

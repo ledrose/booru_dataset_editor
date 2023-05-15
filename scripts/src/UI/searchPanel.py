@@ -1,5 +1,5 @@
-from .singleton import Singleton
-from src import Imageboard, ImageGroup
+from . singleton import Singleton
+from scripts.src import Imageboard, ImageGroup
 import gradio as gr
 
 def getNewFileName(inp, filename, oldname):

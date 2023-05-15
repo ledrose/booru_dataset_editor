@@ -1,4 +1,4 @@
-from .Imageboard import ImageboardFactory, Imageboard, factoryDict
+from scripts.src.Imageboard import ImageboardFactory, Imageboard, factoryDict
 from pypac.parser import PACFile
 from pypac import PACSession
 import pathlib

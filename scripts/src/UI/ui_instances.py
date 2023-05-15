@@ -1,4 +1,4 @@
-from .ui_classes import *
+from . ui_classes import *
 
 __all__ = [
     "searchPanel",

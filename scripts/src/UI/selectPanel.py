@@ -1,5 +1,5 @@
-from .singleton import Singleton 
-from src.ImageGroup import ImageGroup
+from . singleton import Singleton 
+from scripts.src.ImageGroup import ImageGroup
 import gradio as gr
 
 class SelectPanelUI(Singleton):

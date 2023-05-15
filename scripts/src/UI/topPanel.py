@@ -1,7 +1,6 @@
-from .singleton import Singleton
-from src.Imageboard import factoryDict
-from src import Imageboard
-from src.ConfigManager import ConfigManager
+from . singleton import Singleton
+from scripts.src.Imageboard import factoryDict, Imageboard
+from scripts.src.ConfigManager import ConfigManager
 import gradio as gr
 
 class TopPanelUI(Singleton):

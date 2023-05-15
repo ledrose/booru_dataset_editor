@@ -1,4 +1,4 @@
-from src.Image import Image
+from scripts.src.Image import Image
 import gradio as gr
 import tqdm
 
