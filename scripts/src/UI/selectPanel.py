@@ -4,11 +4,11 @@ import gradio as gr
 
 class SelectPanelUI(Singleton):
     def __init__(self):
-        self.selectedImages = ImageGroup()
-        self.filterdImages = ImageGroup()
+        # self.selectedImages = ImageGroup()
         self.currentImage = None
 
     def createUI(self):
+        self.selectedImages = gr.State(ImageGroup())
         with gr.Column():
             self.selectedImagesGallery=gr.Gallery(
                 label="Selected Images",
@@ -30,48 +30,48 @@ class SelectPanelUI(Singleton):
 
 
     def addCallbacks(self, currentLoadedImage, loadedImages, tagCheckboxGroup):
-        def addToSelect(currentLoadedImage):
+        def addToSelect(selectedImages, currentLoadedImage):
             if (currentLoadedImage!=None):
-                self.selectedImages.add(currentLoadedImage)
-            return [self.selectedImages.getGalleryTuples(), gr.CheckboxGroup().update(choices=self.selectedImages.getTagsInfo())]
+                selectedImages.add(currentLoadedImage)
+            return [selectedImages, selectedImages.getGalleryTuples(), gr.CheckboxGroup().update(choices=selectedImages.getTagsInfo())]
 
         self.btnAddToSelected.click(
-            fn=addToSelect, inputs=[currentLoadedImage], outputs=[self.selectedImagesGallery, tagCheckboxGroup]
+            fn=addToSelect, inputs=[self.selectedImages, currentLoadedImage], outputs=[self.selectedImages, self.selectedImagesGallery, tagCheckboxGroup]
         )
-        def addAllToSelect():
+        def addAllToSelect(selectedImages):
             for image in loadedImages.images:
-                self.selectedImages.add(image)
-            return self.selectedImages.getGalleryTuples()
+                selectedImages.add(image)
+            return [selectedImages ,selectedImages.getGalleryTuples(), gr.CheckboxGroup().update(choices=selectedImages.getTagsInfo())]
 
         self.btnAddAllToSelected.click(
-            fn=addAllToSelect, inputs=[], outputs=[self.selectedImagesGallery]
+            fn=addAllToSelect, inputs=[self.selectedImages], outputs=[self.selectedImages, self.selectedImagesGallery, tagCheckboxGroup]
         )
 
-        def removeFromSelected():
+        def removeFromSelected(selectedImages):
             if (self.currentImage!=None):
-                self.currentImage = self.selectedImages.remove(self.currentImage)
-            return self.selectedImages.getGalleryTuples()
+                self.currentImage = selectedImages.remove(self.currentImage)
+            return [selectedImages, selectedImages.getGalleryTuples(), gr.CheckboxGroup().update(choices=selectedImages.getTagsInfo())]
 
         self.btnRemoveFromSelected.click(
-            fn=removeFromSelected, inputs=[], outputs=[self.selectedImagesGallery]
+            fn=removeFromSelected, inputs=[self.selectedImages], outputs=[self.selectedImages, self.selectedImagesGallery, tagCheckboxGroup]
         )
-        def clearSelection():
-            self.selectedImages.images = set()
-            return self.selectedImages.getGalleryTuples()
+        def clearSelection(selectedImages):
+            selectedImages.images = set()
+            return [selectedImages, selectedImages.getGalleryTuples(), gr.CheckboxGroup().update(choices=selectedImages.getTagsInfo())]
         self.btnClearToSelection.click(
-            fn=clearSelection, inputs=[], outputs=[self.selectedImagesGallery]
+            fn=clearSelection, inputs=[self.selectedImages], outputs=[self.selectedImages, self.selectedImagesGallery, tagCheckboxGroup]
         )
-        def onGallerySelected(evt: gr.SelectData):
-            self.currentImage = self.selectedImages.getImageByFilename(evt.value)
+        def onGallerySelected(selectedImages, evt: gr.SelectData):
+            self.currentImage = selectedImages.getImageByFilename(evt.value)
         
         self.selectedImagesGallery.select(
-            fn=onGallerySelected, inputs=[], outputs=[]
+            fn=onGallerySelected, inputs=[self.selectedImages], outputs=[]
         )
 
-        def downloadImages(savePath, namePattern, progress=gr.Progress(track_tqdm=True)):
-            self.selectedImages.downloadAll(savePath, namePattern)
+        def downloadImages(selectedImages, savePath, namePattern, progress=gr.Progress(track_tqdm=True)):
+            selectedImages.downloadAll(savePath, namePattern)
             return savePath
 
         self.btnDownload.click(
-            fn=downloadImages,inputs=[self.savePathTextbox, self.namePatternTexbox],outputs=[self.savePathTextbox]
+            fn=downloadImages,inputs=[self.selectedImages, self.savePathTextbox, self.namePatternTexbox],outputs=[self.savePathTextbox]
         )

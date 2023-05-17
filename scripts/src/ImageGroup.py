@@ -7,9 +7,10 @@ import tqdm
 class ImageGroup:
     def __init__(self, imgSet: set[type(Image)] = set()):
         self.images = imgSet
+        self.filter = None
 
     def getGalleryTuples(self):
-        return [x.getImageTuple() for x in tqdm.tqdm(self.images, unit="images loaded", desc="Loading Images")]
+        return [x.getImageTuple() for x in tqdm.tqdm(self.getFilteredImgSet(), unit="images loaded", desc="Loading Images")]
         
     def getImageByFilename(self, filename: str) -> type(Image):
         return next((x for x in iter(self.images) if x.fullName == filename), None)
@@ -32,6 +33,17 @@ class ImageGroup:
         for ind, img in tqdm.tqdm(enumerate(self.images)):
             img.downloadName = pattern(ind, img)
             img.saveImageWithTags(path)
+
+    def getFilteredImgSet(self, type='AND'):
+        if (self.filter==None):
+            return self.images
+        if type=='AND':
+            return [x for x in self.images if all(tag in self.filter for tag in x.tags)]
+        elif type=='OR':
+            return [x for x in self.images if any(tag in self.filter for tag in x.tags)]
+        else:
+            raise ValueError("Incorrect type of filtration")
+
 
     def getTagsInfo(self):
         tags = []
