@@ -57,7 +57,7 @@ class ImageboardFactory:
                 'name':data['md5'],
                 'ext':data['image'].replace(data['md5']+'.',''),
                 'imgLink':data['file_url'], 
-                'tags': ' '.split(data['tags']), 
+                'tags': data['tags'].split(' '), 
                 'previewImagelink':data['preview_url'],
             }
         def payloadCreator(searchInput, pageNum, limit):

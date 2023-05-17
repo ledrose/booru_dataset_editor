@@ -5,6 +5,7 @@ import gradio as gr
 class SelectPanelUI(Singleton):
     def __init__(self):
         self.selectedImages = ImageGroup()
+        self.filterdImages = ImageGroup()
         self.currentImage = None
 
     def createUI(self):
@@ -28,14 +29,14 @@ class SelectPanelUI(Singleton):
                 self.btnDownload = gr.Button("Download").style(full_width=True)
 
 
-    def addCallbacks(self, currentLoadedImage, loadedImages):
+    def addCallbacks(self, currentLoadedImage, loadedImages, tagCheckboxGroup):
         def addToSelect(currentLoadedImage):
             if (currentLoadedImage!=None):
                 self.selectedImages.add(currentLoadedImage)
-            return self.selectedImages.getGalleryTuples()
+            return [self.selectedImages.getGalleryTuples(), gr.CheckboxGroup().update(choices=self.selectedImages.getTagsInfo())]
 
         self.btnAddToSelected.click(
-            fn=addToSelect, inputs=[currentLoadedImage], outputs=[self.selectedImagesGallery]
+            fn=addToSelect, inputs=[currentLoadedImage], outputs=[self.selectedImagesGallery, tagCheckboxGroup]
         )
         def addAllToSelect():
             for image in loadedImages.images:

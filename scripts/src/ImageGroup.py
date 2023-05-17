@@ -1,5 +1,6 @@
 from scripts.src.Image import Image
 from scripts.src.PatternParser import parsePattern
+from collections import Counter
 import gradio as gr
 import tqdm
 
@@ -31,3 +32,11 @@ class ImageGroup:
         for ind, img in tqdm.tqdm(enumerate(self.images)):
             img.downloadName = pattern(ind, img)
             img.saveImageWithTags(path)
+
+    def getTagsInfo(self):
+        tags = []
+        for image in self.images:
+            tags.extend(image.tags)
+        tags = Counter(tags)
+        # print(tags[0])
+        return [f"{x} {y}" for x,y in tags.most_common()]
