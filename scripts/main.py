@@ -1,5 +1,5 @@
 import modules.scripts as scripts
-from scripts.start import start as extStart
+from scripts.MainTab import start as extStart
 import gradio as gr
 import os
 

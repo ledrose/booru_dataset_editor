@@ -7,7 +7,7 @@ def getSession(useProxy=True):
     # print(file)
     if (useProxy):
         try:
-            with open('extensions/sd-webui-boorugrabber/proxy-ssl.js') as f:
+            with open('proxy-ssl.js') as f:
                 pac = PACFile(f.read())
             session = PACSession(pac)
         except:
