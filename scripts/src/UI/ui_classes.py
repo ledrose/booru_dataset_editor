@@ -1,12 +1,11 @@
 from . searchPanel import SearchPanelUI
 from . selectPanel import SelectPanelUI
 from . topPanel import TopPanelUI
-from . loadDatasetPanel import LoadDatasetPanelUI
+from . tagEditPanel import TagEditPanelUI
 
 __all__ = [
     "SearchPanelUI",
     "SelectPanelUI",
     "TopPanelUI",
-    "LoadDatasetPanelUI",
-    # "ImageboardTabUI"
+    "TagEditPanelUI",
 ]

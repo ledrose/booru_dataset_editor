@@ -4,12 +4,12 @@ __all__ = [
     "searchPanel",
     "selectPanel",
     "topPanel",
-    "loadDatasetPanel"
+    "tagEditPanel"
     # "imageboardTab"
 ]
 
 searchPanel = SearchPanelUI.getInstance()
 selectPanel = SelectPanelUI.getInstance()
 topPanel = TopPanelUI().getInstance()
-loadDatasetPanel = LoadDatasetPanelUI().getInstance()
+tagEditPanel = TagEditPanelUI().getInstance()
 # imageboardTab = ImageboardTabUI.getInstance()

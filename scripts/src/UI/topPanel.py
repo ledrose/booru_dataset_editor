@@ -8,7 +8,7 @@ class TopPanelUI(Singleton):
         self.imageboardList = ConfigManager.getImageboardsFromJson('imagebords.json')
 
     def createUI(self):
-        with gr.Row():
+        with gr.Column():
             self.selectImageboard = gr.Dropdown([x.name for x in self.imageboardList],multiselect=False, interactive=True,label="Выбор имиджборда", value=self.imageboardList[0].name)
             with gr.Accordion("Edit or add new imageboard", open=False):
                 with gr.Column():

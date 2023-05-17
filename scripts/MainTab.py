@@ -5,18 +5,19 @@ from dataclasses import dataclass
 
 
 def start():
-    with gr.Tab('Download'):
-        currentLoadedImage = gr.State(None)
-        with gr.Column():
-            topPanel.createUI()
-            imageboard = gr.State(topPanel.imageboardList[0])
-            with gr.Row():
-                searchPanel.createUI()
-                selectPanel.createUI()
-        topPanel.addCallbacks(imageboard)
-        searchPanel.addCallbacks(currentLoadedImage, imageboard, selectPanel.savePathTextbox)
-        selectPanel.addCallbacks(currentLoadedImage, searchPanel.loadedImages)
-    with gr.Tab('Dataset Work'):
-        loadDatasetPanel.createUI()
-        loadDatasetPanel.addCallbacks()
+    currentLoadedImage = gr.State(None)
+    with gr.Column():
+        imageboard = gr.State(topPanel.imageboardList[0])
+        with gr.Row():
+            with gr.Tab("Imageboard"):
+                with gr.Column():
+                    topPanel.createUI()
+                    searchPanel.createUI()
+            with gr.Tab("Tags"):
+                tagEditPanel.createUI()
+            selectPanel.createUI()
+    topPanel.addCallbacks(imageboard)
+    searchPanel.addCallbacks(currentLoadedImage, imageboard, selectPanel.savePathTextbox)
+    selectPanel.addCallbacks(currentLoadedImage, searchPanel.loadedImages)
+    tagEditPanel.addCallbacks()
 
