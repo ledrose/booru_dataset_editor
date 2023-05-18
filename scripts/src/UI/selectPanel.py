@@ -15,7 +15,7 @@ class SelectPanelUI(Singleton):
                 show_label=True,
                 elem_id='selected_gallery',
             ).style(
-                columns=6, rows=2, height=300,
+                columns=6, rows=2,
             )
             self.savePathTextbox = gr.Textbox(label="Save folder", value='test')
             self.namePatternTexbox = gr.Textbox(label="NamePattern", value='<index>_<name>')

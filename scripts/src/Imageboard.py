@@ -11,7 +11,7 @@ class ImageboardFactory:
     @staticmethod
     def danbooruLike(name: str, mainLink: str, login: str = None, apiKey: str = None):
         def inputTransform(searchInput: str) -> str:
-            return searchInput.replace(' ', '+')
+            return searchInput
         def parseData(json):
             return json
         def parseImage(data):
@@ -148,6 +148,7 @@ class Imageboard:
         response = self.session.get(self.authLink,auth=basicAuth)
         if (response.status_code!=requests.codes.ok):
             raise Exception("Auth is not succesful")
+        self.isAuthenticated = True
 
 
 def main():

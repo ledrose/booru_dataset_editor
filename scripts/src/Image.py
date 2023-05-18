@@ -45,7 +45,7 @@ class Image:
 
         textFile = folder / f"{self.downloadName}.txt"
         textFile.touch(exist_ok=True)
-        textFile.write_text(' '.join(self.tags))
+        textFile.write_text(' '.join(self.tags).replace('_', ' '))
 
     def tagsReplace(self, replaceDict: dict):
         tagsjoined = "'''".join(self.tags)

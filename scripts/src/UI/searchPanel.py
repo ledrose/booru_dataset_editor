@@ -21,7 +21,7 @@ class SearchPanelUI(Singleton):
                 show_label=True,
                 elem_id='gallery',
             ).style(
-                columns=6, rows=2,
+                columns=6, rows=2
             )
             self.searchRequestTextbox = gr.Textbox(
                 label="Enter your search request",
