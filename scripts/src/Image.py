@@ -47,4 +47,15 @@ class Image:
         textFile.touch(exist_ok=True)
         textFile.write_text(' '.join(self.tags))
 
-        
+    def tagsReplace(self, replaceDict: dict):
+        tagsjoined = "'''".join(self.tags)
+        for key,value in replaceDict.items():
+            tagsjoined = tagsjoined.replace(key, value)
+        self.tags = list(set(tagsjoined.split("'''")))
+
+
+    def tagsAdd(self, addList: list):
+        self.tags.extend([tag for tag in addList if tag not in self.tags])
+
+    def tagsRemove(self, removeList: list):
+        self.tags = [tag for tag in self.tags if tag not in removeList]

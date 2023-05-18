@@ -6,8 +6,13 @@ class TagEditPanelUI(Singleton):
         pass
 
     def createUI(self):
-        self.modeRadio = gr.Radio(choices=['NONE','AND', 'OR'], value='NONE', label="Mode of tag selection")
-        self.btnClearSelection = gr.Button('Clear Selection')
+        with gr.Accordion('Replace tags', open=False):
+            self.replaceSourceTextBox = gr.Textbox(label='What to replace', placeholder='tags separated by comma', info='If there is no corresponding tag in second box, that tag will be removed')
+            self.replaceDestTextBox = gr.Textbox(label='Replace with what', placeholder='tags separated by comma', info='If there is no corresponding tag in first box, that tag will be added')
+            self.replaceConfirmBtn = gr.Button('Apply replacement')
+        with gr.Row():
+            self.modeRadio = gr.Radio(choices=['NONE','AND', 'OR'], value='NONE', label="Mode of tag selection")
+            self.btnClearSelection = gr.Button('Clear Selection')
         self.tagCheckboxGroup = gr.CheckboxGroup(label='Tags')
 
     def addCallbacks(self, selectedImages, selectedImagesGallery):
@@ -28,4 +33,10 @@ class TagEditPanelUI(Singleton):
             return [selectedImages, selectedImages.getGalleryTuples(), [], "NONE"]
         self.btnClearSelection.click(
             fn=clearSelection, inputs=[selectedImages], outputs=[selectedImages, selectedImagesGallery, self.tagCheckboxGroup, self.modeRadio]
+        )
+        def replaceTags(source, dest, selectedImages):
+            selectedImages.replaceTags(source, dest)
+            return [selectedImages, gr.CheckboxGroup().update(choices=selectedImages.getTagsInfo())]
+        self.replaceConfirmBtn.click(
+            fn=replaceTags, inputs=[self.replaceSourceTextBox, self.replaceDestTextBox, selectedImages], outputs=[selectedImages, self.tagCheckboxGroup]
         )

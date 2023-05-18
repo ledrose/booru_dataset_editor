@@ -31,7 +31,7 @@ class ImageGroup:
 
     def downloadAll(self,path: str, pattern) -> None:
         pattern = parsePattern(pattern)
-        for ind, img in tqdm.tqdm(enumerate(self.images)):
+        for ind, img in tqdm.tqdm(enumerate(self.getFilteredImgSet())):
             img.downloadName = pattern(ind, img)
             img.saveImageWithTags(path)
 
@@ -72,3 +72,18 @@ class ImageGroup:
         tags = Counter(tags).most_common()
         # print(tags[0])
         return [f'{x} {y}' for x,y in tags]
+
+    def replaceTags(self, source: str, dest: str):
+        keys = [x.strip() for x in source.split(',')]
+        values = [x.strip() for x in dest.split(',')]
+        if (len(keys)>len(values)):
+            values+=['']*(len(keys)-len(values))
+        if (len(values)>len(keys)):
+            keys+=['']*(len(values)-len(keys))
+        replaceDict = dict([(key,val) for key, val in zip(keys, values) if (key!='' and val!='')])
+        addList = [val for key,val in zip(keys,values) if (key=='' and val!='')]
+        removeList = [key for key,val in zip(keys,values) if (key!='' and val=='')]
+        for image in self.getFilteredImgSet():
+            image.tagsReplace(replaceDict)
+            image.tagsAdd(addList)
+            image.tagsRemove(removeList)
