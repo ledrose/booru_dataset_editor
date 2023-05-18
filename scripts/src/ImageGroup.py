@@ -35,39 +35,39 @@ class ImageGroup:
             img.downloadName = pattern(ind, img)
             img.saveImageWithTags(path)
 
-    def getFilteredImgSet(self):
-        print(f"{self.filter}  {self.filterType}")
-        print([x.tags for x in self.images])
-        arr = []
-        if self.filterType=='AND':
-            for image in self.images:
-                isAll = True
-                for tag in self.filter:
-                    if (not tag in image.tags):
-                        isAll=False
-                if (isAll):
-                    arr.append(image)
-            # print(arr)
-            # return [x for x in self.images if all(tag in self.filter for tag in x.tags)]
-            return arr
-        elif self.filterType=='OR':
-            if (not self.filter):
-                return self.images
-            for image in self.images:
-                isSome =False
-                for tag in self.filter:
-                    if (tag in image.tags):
-                        isSome=True
-                if (isSome):
-                    arr.append(image)
-            return arr
+    def getFilteredImgSet(self, filter=True):
+        # print(f"{self.filter}  {self.filterType}")
+        # print([x.tags for x in self.images])
+        if filter:
+            arr = []
+            if self.filterType=='AND':
+                for image in self.images:
+                    isAll = True
+                    for tag in self.filter:
+                        if (not tag in image.tags):
+                            isAll=False
+                    if (isAll):
+                        arr.append(image)
+                # print(arr)
+                # return [x for x in self.images if all(tag in self.filter for tag in x.tags)]
+                return arr
+            elif self.filterType=='OR':
+                if (not self.filter):
+                    return self.images
+                for image in self.images:
+                    isSome =False
+                    for tag in self.filter:
+                        if (tag in image.tags):
+                            isSome=True
+                    if (isSome):
+                        arr.append(image)
+                return arr
             # return [x for x in self.images if any(tag in self.filter for tag in x.tags)]
-        else:
-            return self.images
+        return self.images
 
-    def getTagsInfo(self):
+    def getTagsInfo(self, useFilter=True):
         tags = []
-        for image in self.images:
+        for image in self.getFilteredImgSet(filter=True):
             tags.extend(image.tags)
         tags = Counter(tags).most_common()
         # print(tags[0])
@@ -84,6 +84,9 @@ class ImageGroup:
         addList = [val for key,val in zip(keys,values) if (key=='' and val!='')]
         removeList = [key for key,val in zip(keys,values) if (key!='' and val=='')]
         for image in self.getFilteredImgSet():
-            image.tagsReplace(replaceDict)
-            image.tagsAdd(addList)
-            image.tagsRemove(removeList)
+            if (replaceDict):
+                image.tagsReplace(replaceDict)
+            if (addList):
+                image.tagsAdd(addList)
+            if (removeList):
+                image.tagsRemove(removeList)
