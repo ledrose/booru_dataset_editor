@@ -6,8 +6,22 @@ class TagEditPanelUI(Singleton):
         pass
 
     def createUI(self):
-        self.tagCheckboxGroup = gr.CheckboxGroup(['1','2','3'], label='Tags')
-        self.modeRadio = gr.Radio(choices=['AND', 'OR'], value='AND', label="Mode of tag selection")
+        self.modeRadio = gr.Radio(choices=['NONE','AND', 'OR'], value='NONE', label="Mode of tag selection")
+        self.btnClearSelection = gr.Button('Clear Selection')
+        self.tagCheckboxGroup = gr.CheckboxGroup(label='Tags')
 
-    def addCallbacks(self):
-        pass
+    def addCallbacks(self, selectedImages, selectedImagesGallery):
+        def onCheckboxChange(selectedImages, tagCheckboxGroup, modeRadio):
+            selectedImages.filter = [x.rpartition(' ')[0] for x in tagCheckboxGroup] 
+            # print(selectedImages.filter)
+            selectedImages.filterType = modeRadio
+            return [selectedImages, selectedImages.getGalleryTuples()]
+        self.tagCheckboxGroup.change(
+            fn=onCheckboxChange, inputs=[selectedImages, self.tagCheckboxGroup,self.modeRadio], outputs=[selectedImages, selectedImagesGallery]
+        )
+        self.modeRadio.change(
+            fn=onCheckboxChange, inputs=[selectedImages, self.tagCheckboxGroup,self.modeRadio], outputs=[selectedImages, selectedImagesGallery]
+        )
+        self.btnClearSelection.click(
+            fn=lambda x: [], inputs=[self.tagCheckboxGroup], outputs=[self.tagCheckboxGroup]
+        )

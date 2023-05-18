@@ -8,6 +8,7 @@ class ImageGroup:
     def __init__(self, imgSet: set[type(Image)] = set()):
         self.images = imgSet
         self.filter = None
+        self.filterType = None
 
     def getGalleryTuples(self):
         return [x.getImageTuple() for x in tqdm.tqdm(self.getFilteredImgSet(), unit="images loaded", desc="Loading Images")]
@@ -34,21 +35,38 @@ class ImageGroup:
             img.downloadName = pattern(ind, img)
             img.saveImageWithTags(path)
 
-    def getFilteredImgSet(self, type='AND'):
-        if (self.filter==None):
-            return self.images
-        if type=='AND':
-            return [x for x in self.images if all(tag in self.filter for tag in x.tags)]
-        elif type=='OR':
-            return [x for x in self.images if any(tag in self.filter for tag in x.tags)]
+    def getFilteredImgSet(self):
+        print(f"{self.filter}  {self.filterType}")
+        print([x.tags for x in self.images])
+        arr = []
+        if self.filterType=='AND':
+            for image in self.images:
+                isAll = True
+                for tag in self.filter:
+                    if (not tag in image.tags):
+                        isAll=False
+                if (isAll):
+                    arr.append(image)
+            # print(arr)
+            # return [x for x in self.images if all(tag in self.filter for tag in x.tags)]
+            return arr
+        elif self.filterType=='OR':
+            for image in self.images:
+                isSome =False
+                for tag in self.filter:
+                    if (tag in image.tags):
+                        isSome=True
+                if (isSome):
+                    arr.append(image)
+            return arr
+            # return [x for x in self.images if any(tag in self.filter for tag in x.tags)]
         else:
-            raise ValueError("Incorrect type of filtration")
-
+            return self.images
 
     def getTagsInfo(self):
         tags = []
         for image in self.images:
             tags.extend(image.tags)
-        tags = Counter(tags)
+        tags = Counter(tags).most_common()
         # print(tags[0])
-        return [f"{x} {y}" for x,y in tags.most_common()]
+        return [f'{x} {y}' for x,y in tags]

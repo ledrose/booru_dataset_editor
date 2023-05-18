@@ -16,8 +16,9 @@ def start():
             with gr.Tab("Tags"):
                 tagEditPanel.createUI()
             selectPanel.createUI()
+            
     topPanel.addCallbacks(imageboard)
     searchPanel.addCallbacks(currentLoadedImage, imageboard, selectPanel.savePathTextbox)
     selectPanel.addCallbacks(currentLoadedImage, searchPanel.loadedImages, tagEditPanel.tagCheckboxGroup)
-    tagEditPanel.addCallbacks()
+    tagEditPanel.addCallbacks(selectPanel.selectedImages, selectPanel.selectedImagesGallery)
 

@@ -54,13 +54,13 @@ class SelectPanelUI(Singleton):
 
         self.btnRemoveFromSelected.click(
             fn=removeFromSelected, inputs=[self.selectedImages], outputs=[self.selectedImages, self.selectedImagesGallery, tagCheckboxGroup]
-        )
+        ).then(fn=lambda x: [], inputs=[tagCheckboxGroup], outputs=[tagCheckboxGroup])
         def clearSelection(selectedImages):
-            selectedImages.images = set()
+            selectedImages = ImageGroup()
             return [selectedImages, selectedImages.getGalleryTuples(), gr.CheckboxGroup().update(choices=selectedImages.getTagsInfo())]
         self.btnClearToSelection.click(
             fn=clearSelection, inputs=[self.selectedImages], outputs=[self.selectedImages, self.selectedImagesGallery, tagCheckboxGroup]
-        )
+        ).then(fn=lambda x: [], inputs=[tagCheckboxGroup], outputs=[tagCheckboxGroup])
         def onGallerySelected(selectedImages, evt: gr.SelectData):
             self.currentImage = selectedImages.getImageByFilename(evt.value)
         
