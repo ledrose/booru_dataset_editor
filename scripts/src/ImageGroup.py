@@ -51,6 +51,8 @@ class ImageGroup:
             # return [x for x in self.images if all(tag in self.filter for tag in x.tags)]
             return arr
         elif self.filterType=='OR':
+            if (not self.filter):
+                return self.images
             for image in self.images:
                 isSome =False
                 for tag in self.filter:

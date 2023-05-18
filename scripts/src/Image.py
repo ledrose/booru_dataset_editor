@@ -6,7 +6,7 @@ class Image:
     def __init__(self, session, imageboardName: str, name: str, ext: str, imgLink: str, previewImagelink: str, tags: list[str] = []) -> None:
         self.imageboardName = imageboardName
         self.imgLink = imgLink
-        self.name = name
+        self.name = name[0:25]
         self.downloadName = name
         self.ext = ext
         self.fullName = f"{self.name}.{self.ext}"

@@ -22,6 +22,10 @@ class TagEditPanelUI(Singleton):
         self.modeRadio.change(
             fn=onCheckboxChange, inputs=[selectedImages, self.tagCheckboxGroup,self.modeRadio], outputs=[selectedImages, selectedImagesGallery]
         )
+        def clearSelection(selectedImages):
+            selectedImages.filter = None
+            selectedImages.filterType = None
+            return [selectedImages, selectedImages.getGalleryTuples(), [], "NONE"]
         self.btnClearSelection.click(
-            fn=lambda x: [], inputs=[self.tagCheckboxGroup], outputs=[self.tagCheckboxGroup]
+            fn=clearSelection, inputs=[selectedImages], outputs=[selectedImages, selectedImagesGallery, self.tagCheckboxGroup, self.modeRadio]
         )
