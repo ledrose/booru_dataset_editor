@@ -15,13 +15,20 @@ class ImageboardFactory:
         def parseData(json):
             return json
         def parseImage(data):
-            return {
-                'name':data['md5'],
-                'ext':data['file_ext'],
-                'imgLink':data['file_url'], 
-                'tags':data['tag_string'].split(' '), 
-                'previewImagelink':data['large_file_url'],
-            }
+            return ImageInfoStruct(
+                hash=data['md5'], 
+                height = data['image_height'], 
+                width = data['image_width'], 
+                create_date = data['created_at'], 
+                id = data['id'], 
+                tag_character = data['tag_string_character'], 
+                tag_artist = data['tag_string_artist'], 
+                tag_general = data['tag_string_general'].split(' '), 
+                score = data['score'], 
+                ext = data['file_ext'], 
+                general_link = data['file_url'], 
+                preview_link = data['media_asset']['variants'][2]['url']
+            )
         def payloadCreator(searchInput, pageNum, limit):
             return {"tags":searchInput, "page": pageNum, "limit": limit}
         return Imageboard(name=name, mainLink=mainLink, type='danbooru', inputTransform=inputTransform, parseImage=parseImage, parseData=parseData, payloadCreator=payloadCreator, isApiKeyNeeded=True, login=login, apiKey=apiKey,
@@ -34,13 +41,20 @@ class ImageboardFactory:
         def parseData(json):
             return json['images']
         def parseImage(data):
-            return {
-                'name':data['sha512_hash'],
-                'ext':data['format'],
-                'imgLink':data['representations']['full'], 
-                'tags':data['tags'], 
-                'previewImagelink':data['representations']['medium'],
-            }
+            return ImageInfoStruct(
+                hash=data['orig_sha512_hash'], 
+                height = data['height'], 
+                width = data['width'], 
+                create_date = data['first_seen_at'], 
+                id = data['id'], 
+                tag_character = data['tags'], #Derpibooru has no such thing as tags type
+                tag_artist = data['tags'], 
+                tag_general = data['tags'], 
+                score = data['score'], 
+                ext = data['format'], 
+                general_link = data['representations']['full'], 
+                preview_link = data['representations']['medium']
+            )
         def payloadCreator(searchInput, pageNum, limit):
             return {"q":searchInput, "page": pageNum, "per_page": limit}
         return Imageboard(name=name, mainLink=mainLink, type='derpibooru', inputTransform=inputTransform, parseImage=parseImage, parseData=parseData, payloadCreator=payloadCreator, isApiKeyNeeded=False,
@@ -53,13 +67,20 @@ class ImageboardFactory:
         def parseData(json):
             return json['post']
         def parseImage(data):
-            return {
-                'name':data['md5'],
-                'ext':data['image'].replace(data['md5']+'.',''),
-                'imgLink':data['file_url'], 
-                'tags': data['tags'].split(' '), 
-                'previewImagelink':data['preview_url'],
-            }
+            return ImageInfoStruct(
+                hash=data['md5'], 
+                height = data['height'], 
+                width = data['width'], 
+                create_date = data['created_at'], 
+                id = data['id'], 
+                tag_character = data['tags'], #Derpibooru has no such thing as tags type
+                tag_artist = data['tags'], 
+                tag_general = data['tags'], 
+                score = data['score'], 
+                ext = data['image'].replace(data['md5']+'.',''),
+                general_link = data['file_url'],
+                preview_link = data['preview_url']
+            )
         def payloadCreator(searchInput, pageNum, limit):
             return {"tags":searchInput, "pid": pageNum, "limit": limit, 'json': 1, 'page':'dapi','s':'post','q':'index'}
         return Imageboard(name=name, mainLink=mainLink, type='gelbooru', inputTransform=inputTransform, parseImage=parseImage, parseData=parseData, payloadCreator=payloadCreator, isApiKeyNeeded=False,
@@ -72,6 +93,19 @@ factoryDict = {
 }        
 
 
+class ImageInfoStruct():
+    def __init__(self, hash, height, width, create_date, id, tag_character, tag_artist, tag_general, score, ext, general_link, preview_link):
+        self.hash = hash
+        self.height = height
+        self.width = width
+        self.create_date = create_date
+        self.id = id
+        self.tag_character = tag_artist
+        self.tag_artist = tag_artist
+        self.tag_general = tag_general
+        self.ext = ext
+        self.general_link = general_link
+        self.preview_link = preview_link
 
 class Imageboard:
     def __init__(self, name: str, mainLink: str, type: str,
@@ -115,28 +149,22 @@ class Imageboard:
                 try:
                     img = self.parseImage(img)
                     # print(img)
-                    if (not img['ext'] in self.allowedExt):
+                    if (not img.ext in self.allowedExt):
                         raise ConnectionError("Not supported format")
                     imgSet.add(Image(
                         session = self.session,
                         imageboardName=self.name,
-                        name=img['name'],
-                        ext=img['ext'],
-                        imgLink=img['imgLink'], 
-                        tags=img['tags'], 
-                        previewImagelink=img['previewImagelink'],
+                        name=img.hash,
+                        ext=img.ext,
+                        imgLink=img.general_link, 
+                        tags=img.tag_general, 
+                        previewImagelink=img.preview_link,
                     ))
                 except:
                     print("Image can't be parsed")
             return imgSet
         else:
             raise Exception("Search was not succesful")
-
-    def getImageLinks(self) -> list[tuple[str, str]]:
-        return [x.getImageTuple() for x in self.imgList]
-
-    def getImageWithFilename(self,filename: str) -> type(Image):
-        return next(x for x in self.imgList if x.fullName==filename)
 
     def requestAuth(self) -> None:
         print('Auth is in progress')
