@@ -20,9 +20,13 @@ class TagEditPanelUI(Singleton):
             selectedImages.filter = [x.rpartition(' ')[0] for x in tagCheckboxGroup] 
             # print(selectedImages.filter)
             selectedImages.filterType = modeRadio
-            if (selectedImages.filterType=="AND"):
-                tagCheckboxGroup = [x for x in selectedImages.getTagsInfo() if (x.rpartition(' ')[0] in selectedImages.filter)]
-            return [selectedImages, selectedImages.getGalleryTuples(), gr.CheckboxGroup().update(value=tagCheckboxGroup, choices=selectedImages.getTagsInfo())]
+            # if (selectedImages.filterType=="AND"):
+            tagCheckboxGroup = [x for x in selectedImages.getTagsInfo() if (x.rpartition(' ')[0] in selectedImages.filter)]
+            if (modeRadio=="AND"):
+                choices = selectedImages.getTagsInfo(useFilter=True)
+            else:
+                choices = selectedImages.getTagsInfo(useFilter=False)
+            return [selectedImages, selectedImages.getGalleryTuples(), gr.CheckboxGroup().update(value=tagCheckboxGroup, choices=choices)]
         self.tagCheckboxGroup.change(
             fn=onCheckboxChange, inputs=[selectedImages, self.tagCheckboxGroup,self.modeRadio], outputs=[selectedImages, selectedImagesGallery, self.tagCheckboxGroup]
         )

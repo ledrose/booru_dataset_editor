@@ -67,7 +67,7 @@ class ImageGroup:
 
     def getTagsInfo(self, useFilter=True):
         tags = []
-        for image in self.getFilteredImgSet(filter=True):
+        for image in self.getFilteredImgSet(filter=useFilter):
             tags.extend(image.tags)
         tags = Counter(tags).most_common()
         # print(tags[0])

@@ -36,8 +36,12 @@ class Image:
 
     def getImageObject(self):
         print(self.info.general_link)
-        bytes = self.session.get(self.info.preview_link, stream=True).raw
-        img = PILImage.open(bytes)
+        try:
+            bytes = self.session.get(self.info.preview_link, stream=True).raw
+            img = PILImage.open(bytes)
+        except:
+            bytes = self.session.get(self.info.general_link, stream=True).raw
+            img = PILImage.open(bytes)
         print(img)
         return img
 

@@ -19,7 +19,7 @@ class SelectPanelUI(Singleton):
             )
             self.savePathTextbox = gr.Textbox(label="Save folder", value='test')
             self.namePatternTexbox = gr.Textbox(label="NamePattern", value='<index>_<hash>')
-            with gr.Accordion('Pattern info'):
+            with gr.Accordion('Pattern info', open=False):
                 self.namePatternInfo = gr.Markdown("""
                     # Avaliable patterns: \n
                     \<id\> - id of image, \n
