@@ -2,7 +2,7 @@ import requests
 from collections.abc import Callable
 from requests.auth import HTTPBasicAuth
 from scripts.src.Session import getSession
-from scripts.src.Image import Image
+from scripts.src.Image import Image, ImageInfoStruct
 import pathlib
 
 
@@ -93,20 +93,6 @@ factoryDict = {
 }        
 
 
-class ImageInfoStruct():
-    def __init__(self, hash, height, width, create_date, id, tag_character, tag_artist, tag_general, score, ext, general_link, preview_link):
-        self.hash = hash
-        self.height = height
-        self.width = width
-        self.create_date = create_date
-        self.id = id
-        self.tag_character = tag_artist
-        self.tag_artist = tag_artist
-        self.tag_general = tag_general
-        self.ext = ext
-        self.general_link = general_link
-        self.preview_link = preview_link
-
 class Imageboard:
     def __init__(self, name: str, mainLink: str, type: str,
                 inputTransform: Callable[[str],str], postsSublink: str, parseData: Callable, parseImage: Callable, payloadCreator: Callable,
@@ -154,11 +140,12 @@ class Imageboard:
                     imgSet.add(Image(
                         session = self.session,
                         imageboardName=self.name,
-                        name=img.hash,
-                        ext=img.ext,
-                        imgLink=img.general_link, 
-                        tags=img.tag_general, 
-                        previewImagelink=img.preview_link,
+                        info = img
+                        # name=img.hash,
+                        # ext=img.ext,
+                        # imgLink=img.general_link, 
+                        # tags=img.tag_general, 
+                        # previewImagelink=img.preview_link,
                     ))
                 except:
                     print("Image can't be parsed")

@@ -18,7 +18,16 @@ class SelectPanelUI(Singleton):
                 columns=6, rows=2,
             )
             self.savePathTextbox = gr.Textbox(label="Save folder", value='test')
-            self.namePatternTexbox = gr.Textbox(label="NamePattern", value='<index>_<name>')
+            self.namePatternTexbox = gr.Textbox(label="NamePattern", value='<index>_<hash>')
+            with gr.Accordion('Pattern info'):
+                self.namePatternInfo = gr.Markdown("""
+                    # Avaliable patterns: \n
+                    \<id\> - id of image, \n
+                    \<w\>, \<h\> - width and height \n
+                    \<index\> - number from 0 to inf. Relies on order in which images are downloaded.\n
+                    <tag_char> - character tags. If imageboard does not give then general tags\n
+                    <create_date> - date of creation of post\n
+                """)
             # self.tagSelectionGroup = gr.CheckboxGroup(["character","copyright","artist","meta"])
             with gr.Row():
                 self.btnAddToSelected = gr.Button("Add").style(full_width=False)

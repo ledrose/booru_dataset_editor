@@ -32,7 +32,7 @@ class ImageGroup:
     def downloadAll(self,path: str, pattern) -> None:
         pattern = parsePattern(pattern)
         for ind, img in tqdm.tqdm(enumerate(self.getFilteredImgSet())):
-            img.downloadName = pattern(ind, img)
+            img.downloadName = pattern(ind, img.info)
             img.saveImageWithTags(path)
 
     def getFilteredImgSet(self, filter=True):

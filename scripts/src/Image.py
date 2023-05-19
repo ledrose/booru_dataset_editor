@@ -2,18 +2,31 @@ import requests
 import pathlib
 from PIL import Image as PILImage
 
-class Image:
-    def __init__(self, session, imageboardName: str, name: str, ext: str, imgLink: str, previewImagelink: str, tags: list[str] = []) -> None:
-        self.imageboardName = imageboardName
-        self.imgLink = imgLink
-        self.name = name[0:25]
-        self.downloadName = name
+
+class ImageInfoStruct():
+    def __init__(self, hash, height, width, create_date, id, tag_character, tag_artist, tag_general, score, ext, general_link, preview_link):
+        self.hash = hash
+        self.height = height
+        self.width = width
+        self.create_date = create_date
+        self.id = id
+        self.tag_character = tag_artist
+        self.tag_artist = tag_artist
+        self.tag_general = tag_general
         self.ext = ext
-        self.fullName = f"{self.name}.{self.ext}"
-        self.localFile = None
-        self.tags = tags
-        self.previewImageLink = previewImagelink
+        self.general_link = general_link
+        self.preview_link = preview_link
+
+class Image:
+    def __init__(self, session, imageboardName: str, info: type(ImageInfoStruct)) -> None:
+        self.imageboardName = imageboardName
         self.session = session
+        self.info = info
+        self.fullName = f"{info.hash}.{info.ext}"
+        self.downloadName = info.hash
+        self.localFile = None
+        self.tags = tags = info.tag_general
+        
 
     def getImageTuple(self) -> tuple[str, str]:
         if self.localFile==None:
@@ -22,8 +35,8 @@ class Image:
             return (self.localFile, self.fullName)
 
     def getImageObject(self):
-        print(self.imgLink)
-        bytes = self.session.get(self.previewImageLink, stream=True).raw
+        print(self.info.general_link)
+        bytes = self.session.get(self.info.preview_link, stream=True).raw
         img = PILImage.open(bytes)
         print(img)
         return img
@@ -33,10 +46,10 @@ class Image:
         if (not folder.is_dir()):
             folder.mkdir()
             
-        response = self.session.get(self.imgLink)
+        response = self.session.get(self.info.general_link)
         if (response.status_code!=requests.codes.ok):
             raise Exception("Failed to download image")
-        imgFile = folder / f'{self.downloadName}.{self.ext}'
+        imgFile = folder / f'{self.downloadName}.{self.info.ext}'
         imgFile.touch(exist_ok=True)
         print("Downloaded image")
         with open(imgFile,'wb') as fd:
