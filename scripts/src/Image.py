@@ -25,7 +25,7 @@ class Image:
         self.fullName = f"{info.hash}.{info.ext}"
         self.downloadName = info.hash
         self.localFile = None
-        self.tags = tags = info.tag_general
+        self.tags = info.tag_general
         
 
     def getImageTuple(self) -> tuple[str, str]:

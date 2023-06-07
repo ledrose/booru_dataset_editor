@@ -23,7 +23,7 @@ class ImageboardFactory:
                 id = data['id'], 
                 tag_character = data['tag_string_character'], 
                 tag_artist = data['tag_string_artist'], 
-                tag_general = data['tag_string_general'].split(' '), 
+                tag_general = data['tag_string'].split(' '), 
                 score = data['score'], 
                 ext = data['file_ext'], 
                 general_link = data['file_url'], 

@@ -2,5 +2,6 @@ __pycache__
 venv
 test
 test.py
+test2.py
 gradio_test.py
 imagebords.json

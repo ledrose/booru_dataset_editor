@@ -54,7 +54,7 @@ class SearchPanelUI(Singleton):
             markdownText = f"""
             **Selected Image Info:** \n
             Filename: {image.fullName} \n
-            Image link: {image.imgLink} \n
+            Image link: {image.info.general_link} \n
             Tags: {' '.join(image.tags)}
             """
             return [image, markdownText]
